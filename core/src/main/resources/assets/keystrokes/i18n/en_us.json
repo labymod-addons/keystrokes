@@ -8,7 +8,37 @@
     },
     "hudWidget" : {
       "keyStrokes" : {
-        "name" : "KeyStrokes"
+        "name" : "KeyStrokes",
+        "edit" : {
+          "name" : "Edit Layout"
+        },
+        "pressedColor" : {
+          "name" : "Default Color When Pressed"
+        },
+        "textColor" : {
+          "name" : "Default Text Color"
+        },
+        "textRgb" : {
+          "name" : "Default Text RGB"
+        },
+        "backgroundColor" : {
+          "name" : "Default Background Color"
+        },
+        "backgroundRgb" : {
+          "name" : "Default Background RGB"
+        },
+        "outline" : {
+          "name" : "Default Outline"
+        },
+        "showCps" : {
+          "name" : "Default Show CPS"
+        },
+        "rgbSpeed" : {
+          "name" : "Default RGB Speed"
+        },
+        "width" : {
+          "name" : "Default Width"
+        }
       }
     }
   }

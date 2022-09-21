@@ -17,44 +17,122 @@
 package net.labymod.addons.keystrokes.hudwidget;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import net.labymod.addons.keystrokes.KeyStroke;
+import java.util.HashSet;
+import java.util.Set;
+import net.labymod.addons.keystrokes.KeyStrokeConfig;
+import net.labymod.addons.keystrokes.activities.HudWidgetEditActivity;
 import net.labymod.api.client.gui.hud.config.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
-import net.labymod.api.client.gui.screen.activity.activities.WorkInProgressActivity;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.widgets.activity.settings.AddonActivityWidget.AddonActivitySetting;
+import net.labymod.api.client.gui.screen.widget.widgets.input.SliderWidget.SliderSetting;
+import net.labymod.api.client.gui.screen.widget.widgets.input.SwitchWidget.SwitchSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.color.ColorPickerWidget.ColorPickerSetting;
 import net.labymod.api.configuration.loader.property.ConfigProperty;
 import net.labymod.api.util.MethodOrder;
 
+@SuppressWarnings("FieldMayBeFinal")
 public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
+
+  @ColorPickerSetting
+  private final ConfigProperty<Integer> pressedColor = new ConfigProperty<>(
+      new Color(255, 255, 255, 155).getRGB()
+  );
+
+  @ColorPickerSetting
+  private final ConfigProperty<Integer> textColor = new ConfigProperty<>(
+      new Color(255, 255, 255, 155).getRGB()
+  );
+
+  @SwitchSetting
+  private final ConfigProperty<Boolean> textRgb = new ConfigProperty<>(false);
 
   @ColorPickerSetting(alpha = true)
   private final ConfigProperty<Integer> backgroundColor = new ConfigProperty<>(
-      Color.WHITE.getRGB());
+      new Color(0, 0, 0, 155).getRGB()
+  );
 
-  private final Map<Key, KeyStroke> keyStrokes = new HashMap<>();
+  @SwitchSetting
+  private final ConfigProperty<Boolean> backgroundRgb = new ConfigProperty<>(false);
+
+  @SwitchSetting
+  private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
+
+  @SwitchSetting
+  private final ConfigProperty<Boolean> showCps = new ConfigProperty<>(false);
+
+  @SliderSetting(min = 1, max = 10)
+  private final ConfigProperty<Integer> rgbSpeed = new ConfigProperty<>(1);
+
+  @SliderSetting(min = 20, max = 100)
+  private final ConfigProperty<Integer> width = new ConfigProperty<>(20);
+
+  private Set<KeyStrokeConfig> keyStrokes = new HashSet<>();
+
+  private Key base;
 
   public KeyStrokesHudWidgetConfig() {
-    this.keyStrokes.put(Key.W, new KeyStroke(-10, 21, 20, 20));
-    this.keyStrokes.put(Key.A, new KeyStroke(-32, -1, 20, 20));
-    this.keyStrokes.put(Key.S, new KeyStroke(-10, -1, 20, 20));
-    this.keyStrokes.put(Key.D, new KeyStroke(12, -1, 20, 20));
+    this.keyStrokes.add(new KeyStrokeConfig(Key.W, this, 0, -22));
+    this.keyStrokes.add(new KeyStrokeConfig(Key.A, this, -22, 0));
+    this.keyStrokes.add(new KeyStrokeConfig(Key.S, this, 0, 0));
+    this.keyStrokes.add(new KeyStrokeConfig(Key.D, this, 22, 0));
+
+    this.base = Key.S;
+  }
+
+  public Set<KeyStrokeConfig> getKeyStrokes() {
+    return this.keyStrokes;
+  }
+
+  @MethodOrder(before = "pressedColor")
+  @AddonActivitySetting
+  public Activity edit() {
+    return new HudWidgetEditActivity(this);
+  }
+
+  public ConfigProperty<Integer> pressedColor() {
+    return this.pressedColor;
+  }
+
+  public ConfigProperty<Integer> textColor() {
+    return this.textColor;
   }
 
   public ConfigProperty<Integer> backgroundColor() {
     return this.backgroundColor;
   }
 
-  public Map<Key, KeyStroke> getKeyStrokes() {
-    return this.keyStrokes;
+  public ConfigProperty<Boolean> outline() {
+    return this.outline;
   }
 
-  @MethodOrder(after = "backgroundColor")
-  @AddonActivitySetting
-  public Activity edit() {
-    return new WorkInProgressActivity("improvement/addon-api");
+  public ConfigProperty<Boolean> showCps() {
+    return this.showCps;
+  }
+
+  public ConfigProperty<Boolean> backgroundRgb() {
+    return this.backgroundRgb;
+  }
+
+  public ConfigProperty<Boolean> textRgb() {
+    return this.textRgb;
+  }
+
+  public ConfigProperty<Integer> rgbSpeed() {
+    return this.rgbSpeed;
+  }
+
+  public ConfigProperty<Integer> width() {
+    return this.width;
+  }
+
+  public KeyStrokeConfig getKeyStroke(Key key) {
+    for (KeyStrokeConfig keyStroke : this.keyStrokes) {
+      if (keyStroke.key() == key) {
+        return keyStroke;
+      }
+    }
+
+    return null;
   }
 }

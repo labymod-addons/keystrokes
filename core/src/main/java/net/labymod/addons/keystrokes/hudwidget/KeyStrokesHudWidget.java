@@ -37,8 +37,6 @@ public class KeyStrokesHudWidget extends HudWidget<KeyStrokesWidget, KeyStrokesH
       @NotNull HudWidgetInfo info,
       @NotNull KeyStrokesHudWidgetConfig config
   ) {
-    super(info, config, () -> {
-      return new KeyStrokesWidget(config, KEY_STROKES);
-    });
+    super(info, config, () -> new KeyStrokesWidget(config, KEY_STROKES));
   }
 }

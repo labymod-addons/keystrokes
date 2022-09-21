@@ -17,7 +17,7 @@
 package net.labymod.addons.keystrokes.listener;
 
 import com.google.inject.Inject;
-import net.labymod.addons.keystrokes.KeyStroke;
+import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.KeyStrokes;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidget;
 import net.labymod.api.client.gui.screen.key.Key;
@@ -37,7 +37,7 @@ public class KeyListener {
   public void onKey(KeyEvent event) {
     Key key = event.key();
     for (KeyStrokesHudWidget hudWidget : this.keyStrokes.getHudWidgets()) {
-      KeyStroke keyStroke = hudWidget.getConfig().getKeyStrokes().get(key);
+      KeyStrokeConfig keyStroke = hudWidget.getConfig().getKeyStroke(key);
       if (keyStroke == null) {
         return;
       }
