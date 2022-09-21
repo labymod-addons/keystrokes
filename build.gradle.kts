@@ -34,6 +34,7 @@ buildscript {
 
 plugins {
     id("java-library")
+    id("org.cadixdev.licenser") version ("0.6.1")
 }
 
 group = "org.example"
@@ -46,6 +47,7 @@ java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 subprojects {
     plugins.apply("java-library")
     plugins.apply("net.labymod.gradle.addon")
+    plugins.apply("org.cadixdev.licenser")
 
     repositories {
         maven("https://libraries.minecraft.net/")
@@ -55,6 +57,11 @@ subprojects {
 
     tasks.compileJava {
         options.encoding = "UTF-8"
+    }
+
+    license {
+        header(rootProject.file("gradle/LICENSE-HEADER.txt"))
+        newLine.set(true)
     }
 }
 
