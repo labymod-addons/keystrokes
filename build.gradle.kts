@@ -60,14 +60,19 @@ subprojects {
 
 addon {
     addonInfo {
-        namespace("example")
-        displayName("Example Addon")
-        author("Example Author")
+        namespace("keystrokes")
+        displayName("KeyStrokes")
+        author("LabyMedia GmbH")
         description("An Example Description!")
         version(System.getenv().getOrDefault("VERSION", "0.0.0"))
 
         //if you want to add dependencies, go to the build.gradle.kts in the core or api module
         //add take a look in the dependencies block
+    }
+
+    dev {
+        releaseChannel = "improvement-addon-api"
+        commitReference = "unknown"
     }
 
     internalRelease()

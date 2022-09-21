@@ -1,0 +1,15 @@
+{
+  "keystrokes" : {
+    "settings" : {
+      "name" : "KeyStrokes",
+      "enabled" : {
+        "name" : "Enabled"
+      }
+    },
+    "hudWidget" : {
+      "keyStrokes" : {
+        "name" : "KeyStrokes"
+      }
+    }
+  }
+}

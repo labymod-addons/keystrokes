@@ -1,4 +1,4 @@
-rootProject.name = "labymod4-addon-template"
+rootProject.name = "keystrokes-addon"
 
 include(":api")
 include(":core")
