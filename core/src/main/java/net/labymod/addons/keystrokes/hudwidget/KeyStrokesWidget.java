@@ -18,6 +18,7 @@ package net.labymod.addons.keystrokes.hudwidget;
 
 import java.awt.*;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
+import net.labymod.addons.keystrokes.widgets.KeyStrokeManageWidget;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
@@ -49,6 +50,11 @@ public class KeyStrokesWidget extends SimpleWidget {
   public void initialize(Parent parent) {
     super.initialize(parent);
     this.bounds.setSize(20, 20);
+
+    if (!(this instanceof KeyStrokeManageWidget)) {
+      this.reload = true;
+      this.updateWidgetBounds(this.bounds);
+    }
   }
 
   @Override
@@ -143,7 +149,7 @@ public class KeyStrokesWidget extends SimpleWidget {
 
       KeyStrokeWidget keyStrokeWidget = null;
       if (this.reload) {
-        keyStrokeWidget = new KeyStrokeWidget(key, keyStroke);
+        keyStrokeWidget = new KeyStrokeWidget(key, keyStroke, this.hudWidgetConfig);
       } else {
         for (Widget child : this.children) {
           if (child instanceof KeyStrokeWidget) {

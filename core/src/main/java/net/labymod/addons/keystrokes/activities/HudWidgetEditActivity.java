@@ -135,7 +135,7 @@ public class HudWidgetEditActivity extends Activity {
     }
 
     KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(mouseButton, this.hudWidgetConfig, x, y);
-    this.hudWidgetConfig.getKeyStrokes().add(keyStrokeConfig);
+    this.hudWidgetConfig.addKeyStroke(keyStrokeConfig);
     System.out.println("Added key " + mouseButton.getName());
     this.overlayWidget.setVisible(false);
     return true;
@@ -157,7 +157,7 @@ public class HudWidgetEditActivity extends Activity {
       }
 
       KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(key, this.hudWidgetConfig, x, y);
-      this.hudWidgetConfig.getKeyStrokes().add(keyStrokeConfig);
+      this.hudWidgetConfig.addKeyStroke(keyStrokeConfig);
     }
 
     this.overlayWidget.setVisible(false);
