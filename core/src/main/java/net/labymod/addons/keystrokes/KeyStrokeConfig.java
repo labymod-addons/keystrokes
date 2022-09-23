@@ -21,7 +21,6 @@ import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.render.font.text.TextRenderer;
-import net.labymod.api.event.client.input.KeyEvent.State;
 import net.labymod.api.util.Lazy;
 
 @SuppressWarnings("FieldMayBeFinal")
@@ -67,13 +66,8 @@ public class KeyStrokeConfig {
 
   }
 
-  public void updatePressed(State state) {
-    if (state == State.HOLDING && !this.pressed) {
-      this.pressed = true;
-      return;
-    }
-
-    this.pressed = state == State.PRESS;
+  public void updatePressed(boolean pressed) {
+    this.pressed = pressed;
   }
 
   public void updateWidth(Key key) {

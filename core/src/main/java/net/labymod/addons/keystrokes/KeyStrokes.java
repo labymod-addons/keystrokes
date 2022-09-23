@@ -22,6 +22,7 @@ import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidget;
 import net.labymod.addons.keystrokes.listener.HudWidgetRegisterListener;
 import net.labymod.addons.keystrokes.listener.HudWidgetUnregisterListener;
 import net.labymod.addons.keystrokes.listener.KeyListener;
+import net.labymod.addons.keystrokes.listener.MouseButtonListener;
 import net.labymod.api.addon.LabyAddon;
 import net.labymod.api.models.addon.annotation.AddonListener;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -39,6 +40,7 @@ public class KeyStrokes extends LabyAddon<KeyStrokesConfiguration> {
     this.registerListener(HudWidgetRegisterListener.class);
     this.registerListener(HudWidgetUnregisterListener.class);
     this.registerListener(KeyListener.class);
+    this.registerListener(MouseButtonListener.class);
 
     this.labyAPI().hudWidgetService().registerWidgetType(KeyStrokesHudWidget.class);
   }

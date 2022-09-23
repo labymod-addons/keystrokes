@@ -22,28 +22,28 @@ import net.labymod.addons.keystrokes.KeyStrokes;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidget;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.event.Subscribe;
-import net.labymod.api.event.client.input.KeyEvent;
-import net.labymod.api.event.client.input.KeyEvent.State;
+import net.labymod.api.event.client.input.MouseButtonEvent;
+import net.labymod.api.event.client.input.MouseButtonEvent.Action;
 
-public class KeyListener {
+public class MouseButtonListener {
 
   private final KeyStrokes keyStrokes;
 
   @Inject
-  private KeyListener(KeyStrokes keyStrokes) {
+  private MouseButtonListener(KeyStrokes keyStrokes) {
     this.keyStrokes = keyStrokes;
   }
 
   @Subscribe
-  public void onKey(KeyEvent event) {
-    Key key = event.key();
+  public void onMouseButton(MouseButtonEvent event) {
+    Key key = event.button();
     for (KeyStrokesHudWidget hudWidget : this.keyStrokes.getHudWidgets()) {
       KeyStrokeConfig keyStroke = hudWidget.getConfig().getKeyStroke(key);
       if (keyStroke == null) {
         continue;
       }
 
-      keyStroke.updatePressed(event.state() != State.UNPRESSED);
+      keyStroke.updatePressed(event.action() == Action.CLICK);
     }
   }
 }
