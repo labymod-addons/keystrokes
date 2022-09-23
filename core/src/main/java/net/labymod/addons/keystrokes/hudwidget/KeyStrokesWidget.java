@@ -48,15 +48,15 @@ public class KeyStrokesWidget extends SimpleWidget {
 
   @Override
   public void render(Stack stack, MutableMouse mouse, float partialTicks) {
-    this.backgroundColor().set(Color.WHITE.getRGB());
-
-    super.render(stack, mouse, partialTicks);
-    RectangleRenderer rectangleRenderer = this.labyAPI.renderPipeline().rectangleRenderer();
     Bounds bounds = this.bounds;
+    RectangleRenderer rectangleRenderer = this.labyAPI.renderPipeline().rectangleRenderer();
+    rectangleRenderer.renderOutline(stack, bounds, Color.RED.getRGB(), 1);
     rectangleRenderer.pos(bounds.getX(), bounds.getCenterY() - 0.5F, bounds.getMaxX(),
         bounds.getCenterY() + 0.5F).color(Color.RED.getRGB()).render(stack);
     rectangleRenderer.pos(bounds.getCenterX() - 0.5F, bounds.getY(), bounds.getCenterX() + 0.5F,
         bounds.getMaxY()).color(Color.RED.getRGB()).render(stack);
+
+    super.render(stack, mouse, partialTicks);
   }
 
   @Override
