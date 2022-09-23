@@ -37,6 +37,10 @@ public class KeyStrokesHudWidget extends HudWidget<KeyStrokesWidget, KeyStrokesH
       @NotNull HudWidgetInfo info,
       @NotNull KeyStrokesHudWidgetConfig config
   ) {
-    super(info, config, () -> new KeyStrokesWidget(config));
+    super(info, config, () -> {
+      KeyStrokesWidget widget = new KeyStrokesWidget(config);
+      config.setWidget(widget);
+      return widget;
+    });
   }
 }

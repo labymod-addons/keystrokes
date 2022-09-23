@@ -58,7 +58,8 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   @SliderSetting(min = 20, max = 100)
   private final ConfigProperty<Integer> width = new ConfigProperty<>(20);
 
-  private ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(new HashSet<>(),
+  private final ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(
+      new HashSet<>(),
       set -> {
         set.add(new KeyStrokeConfig(Key.W, this, 0, -22));
         set.add(new KeyStrokeConfig(Key.A, this, -22, 0));
@@ -66,7 +67,9 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
         set.add(new KeyStrokeConfig(Key.D, this, 22, 0));
       });
 
-  private ConfigProperty<Key> base = new ConfigProperty<>(Key.S);
+  private final ConfigProperty<Key> base = new ConfigProperty<>(Key.S);
+
+  private transient KeyStrokesWidget widget;
 
   public Set<KeyStrokeConfig> getKeyStrokes() {
     return this.keyStrokes.get();
@@ -123,5 +126,13 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
     this.keyStrokes.get().add(keyStrokeConfig);
     return true;
+  }
+
+  public void setWidget(KeyStrokesWidget widget) {
+    this.widget = widget;
+  }
+
+  public KeyStrokesWidget widget() {
+    return this.widget;
   }
 }

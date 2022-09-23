@@ -20,7 +20,6 @@ import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.mouse.MutableMouse;
-import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.SimpleWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
@@ -46,11 +45,6 @@ public class KeyStrokeWidget extends SimpleWidget {
     this.key = key;
     this.keyStroke = keyStroke;
     this.defaultConfig = defaultConfig;
-  }
-
-  @Override
-  public void initialize(Parent parent) {
-    super.initialize(parent);
   }
 
   @Override

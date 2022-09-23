@@ -49,7 +49,14 @@ public class HudWidgetEditActivity extends Activity {
   public HudWidgetEditActivity(KeyStrokesHudWidgetConfig hudWidgetConfig) {
     this.hudWidgetConfig = hudWidgetConfig;
 
-    this.manageWidget = new KeyStrokeManageWidget(this.hudWidgetConfig);
+    this.manageWidget = new KeyStrokeManageWidget(this.hudWidgetConfig, selected -> {
+      if (selected == null) {
+        System.out.println("Unselect");
+      }
+
+      System.out.println("Selected " + selected.key().getName());
+    });
+
     this.manageWidget.addId("manage");
   }
 
@@ -121,6 +128,12 @@ public class HudWidgetEditActivity extends Activity {
   }
 
   @Override
+  public void onCloseScreen() {
+    super.onCloseScreen();
+    this.hudWidgetConfig.widget().checkForNewKeyStrokes();
+  }
+
+  @Override
   public boolean mouseClicked(MutableMouse mouse, MouseButton mouseButton) {
     if (this.overlayWidget == null || !this.overlayWidget.isVisible()) {
       return super.mouseClicked(mouse, mouseButton);
@@ -136,6 +149,8 @@ public class HudWidgetEditActivity extends Activity {
 
     KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(mouseButton, this.hudWidgetConfig, x, y);
     this.hudWidgetConfig.addKeyStroke(keyStrokeConfig);
+    this.manageWidget.checkForNewKeyStrokes();
+    this.manageWidget.setFocused(keyStrokeConfig);
     System.out.println("Added key " + mouseButton.getName());
     this.overlayWidget.setVisible(false);
     return true;
@@ -158,6 +173,8 @@ public class HudWidgetEditActivity extends Activity {
 
       KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(key, this.hudWidgetConfig, x, y);
       this.hudWidgetConfig.addKeyStroke(keyStrokeConfig);
+      this.manageWidget.checkForNewKeyStrokes();
+      this.manageWidget.setFocused(keyStrokeConfig);
     }
 
     this.overlayWidget.setVisible(false);
