@@ -36,6 +36,11 @@ public class KeyStrokesWidget extends SimpleWidget {
   private final KeyStrokesHudWidgetConfig hudWidgetConfig;
   private boolean reload;
 
+  protected float x;
+  protected float y;
+  protected float maxX;
+  protected float maxY;
+
   public KeyStrokesWidget(KeyStrokesHudWidgetConfig hudWidgetConfig) {
     this.hudWidgetConfig = hudWidgetConfig;
   }
@@ -55,6 +60,25 @@ public class KeyStrokesWidget extends SimpleWidget {
         bounds.getCenterY() + 0.5F).color(Color.RED.getRGB()).render(stack);
     rectangleRenderer.pos(bounds.getCenterX() - 0.5F, bounds.getY(), bounds.getCenterX() + 0.5F,
         bounds.getMaxY()).color(Color.RED.getRGB()).render(stack);
+
+    for (Widget child : this.children) {
+      if (child instanceof KeyStrokeWidget) {
+        KeyStrokeWidget keyStrokeWidget = (KeyStrokeWidget) child;
+        if (keyStrokeWidget.getKey() != this.hudWidgetConfig.base().get()) {
+          continue;
+        }
+
+        KeyStrokeConfig config = keyStrokeWidget.getKeyStroke();
+        rectangleRenderer.renderOutline(stack, child.bounds(), Color.YELLOW.getRGB(), 1);
+
+        rectangleRenderer
+            .pos(child.bounds().getX() - config.getX(), child.bounds().getY() - config.getY())
+            .size(1)
+            .color(Color.YELLOW.getRGB())
+            .render(stack);
+        break;
+      }
+    }
 
     super.render(stack, mouse, partialTicks);
   }
@@ -91,12 +115,29 @@ public class KeyStrokesWidget extends SimpleWidget {
       Key key = keyStroke.key();
       if (keyStroke != anchor) {
         keyStroke.updateWidth(key);
+
         if (keyStroke.getX() >= 0 && width < anchorX + keyStroke.getX() + keyStroke.getWidth()) {
           width = anchorX + keyStroke.getX() + keyStroke.getWidth();
         }
 
         if (keyStroke.getY() >= 0 && height < anchorY + keyStroke.getY() + HEIGHT) {
           height = anchorY + keyStroke.getY() + HEIGHT;
+        }
+
+        if (this.x > keyStroke.getX()) {
+          this.x = keyStroke.getX();
+        }
+
+        if (this.y > keyStroke.getY()) {
+          this.y = keyStroke.getY();
+        }
+
+        if (this.maxX < keyStroke.getX() + keyStroke.getWidth()) {
+          this.maxX = keyStroke.getX() + keyStroke.getWidth();
+        }
+
+        if (this.maxY < keyStroke.getY() + HEIGHT) {
+          this.maxY = keyStroke.getY() + HEIGHT;
         }
       }
 
@@ -149,5 +190,21 @@ public class KeyStrokesWidget extends SimpleWidget {
   public void onBoundsChanged(Rectangle previousRect, Rectangle bounds) {
     super.onBoundsChanged(previousRect, bounds);
     this.updateWidgetBounds(bounds);
+  }
+
+  public float getX() {
+    return this.x;
+  }
+
+  public float getY() {
+    return this.y;
+  }
+
+  public float getMaxX() {
+    return this.maxX;
+  }
+
+  public float getMaxY() {
+    return this.maxY;
   }
 }

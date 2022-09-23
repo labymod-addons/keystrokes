@@ -126,7 +126,15 @@ public class HudWidgetEditActivity extends Activity {
       return super.mouseClicked(mouse, mouseButton);
     }
 
-    KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(mouseButton, this.hudWidgetConfig, 0, 22);
+    float x = 0;
+    float y = 0;
+    if (this.manageWidget.getMaxX() < this.manageWidget.getMaxY()) {
+      x = this.manageWidget.getMaxX() + 2;
+    } else {
+      y = this.manageWidget.getMaxY() + 2;
+    }
+
+    KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(mouseButton, this.hudWidgetConfig, x, y);
     this.hudWidgetConfig.getKeyStrokes().add(keyStrokeConfig);
     System.out.println("Added key " + mouseButton.getName());
     this.overlayWidget.setVisible(false);
@@ -140,7 +148,15 @@ public class HudWidgetEditActivity extends Activity {
     }
 
     if (key != Key.ESCAPE) {
-      KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(key, this.hudWidgetConfig, 0, 22);
+      float x = 0;
+      float y = 0;
+      if (this.manageWidget.getMaxX() < this.manageWidget.getMaxY()) {
+        x = this.manageWidget.getMaxX() + 2;
+      } else {
+        y = this.manageWidget.getMaxY() + 2;
+      }
+
+      KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(key, this.hudWidgetConfig, x, y);
       this.hudWidgetConfig.getKeyStrokes().add(keyStrokeConfig);
     }
 
