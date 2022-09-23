@@ -38,11 +38,8 @@ public class KeyStrokeConfig {
   private int pressedColor;
   private int textColor;
   private int backgroundColor;
-  private boolean textRgb;
-  private boolean backgroundRgb;
   private boolean outline;
   private boolean showCps;
-  private int rgbSpeed;
 
   private float width;
 
@@ -53,11 +50,8 @@ public class KeyStrokeConfig {
     this.pressedColor = config.pressedColor().get();
     this.textColor = config.textColor().get();
     this.backgroundColor = config.backgroundColor().get();
-    this.textRgb = config.textRgb().get();
-    this.backgroundRgb = config.backgroundRgb().get();
     this.outline = config.outline().get();
     this.showCps = config.showCps().get();
-    this.rgbSpeed = config.rgbSpeed().get();
     this.width = config.width().get();
     this.updateWidth(key);
 
@@ -98,24 +92,12 @@ public class KeyStrokeConfig {
     return this.backgroundColor;
   }
 
-  public boolean isTextRgb() {
-    return this.textRgb;
-  }
-
-  public boolean isBackgroundRgb() {
-    return this.backgroundRgb;
-  }
-
   public boolean hasOutline() {
     return this.outline;
   }
 
   public boolean showingCps() {
     return this.showCps;
-  }
-
-  public int getRgbSpeed() {
-    return this.rgbSpeed;
   }
 
   public float getWidth() {

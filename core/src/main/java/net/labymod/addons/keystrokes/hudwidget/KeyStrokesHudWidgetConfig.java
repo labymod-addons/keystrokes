@@ -36,16 +36,13 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   @ColorPickerSetting
   private final ConfigProperty<Integer> pressedColor = new ConfigProperty<>(
-      new Color(255, 255, 255, 155).getRGB()
+      new Color(255, 255, 255, 255).getRGB()
   );
 
   @ColorPickerSetting
   private final ConfigProperty<Integer> textColor = new ConfigProperty<>(
-      new Color(255, 255, 255, 155).getRGB()
+      new Color(255, 255, 255, 255).getRGB()
   );
-
-  @SwitchSetting
-  private final ConfigProperty<Boolean> textRgb = new ConfigProperty<>(false);
 
   @ColorPickerSetting(alpha = true)
   private final ConfigProperty<Integer> backgroundColor = new ConfigProperty<>(
@@ -53,16 +50,10 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   );
 
   @SwitchSetting
-  private final ConfigProperty<Boolean> backgroundRgb = new ConfigProperty<>(false);
-
-  @SwitchSetting
   private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
 
   @SwitchSetting
   private final ConfigProperty<Boolean> showCps = new ConfigProperty<>(false);
-
-  @SliderSetting(min = 1, max = 10)
-  private final ConfigProperty<Integer> rgbSpeed = new ConfigProperty<>(1);
 
   @SliderSetting(min = 20, max = 100)
   private final ConfigProperty<Integer> width = new ConfigProperty<>(20);
@@ -107,18 +98,6 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return this.showCps;
   }
 
-  public ConfigProperty<Boolean> backgroundRgb() {
-    return this.backgroundRgb;
-  }
-
-  public ConfigProperty<Boolean> textRgb() {
-    return this.textRgb;
-  }
-
-  public ConfigProperty<Integer> rgbSpeed() {
-    return this.rgbSpeed;
-  }
-
   public ConfigProperty<Integer> width() {
     return this.width;
   }
@@ -135,5 +114,14 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   public ConfigProperty<Key> base() {
     return this.base;
+  }
+
+  public boolean addKeyStroke(KeyStrokeConfig keyStrokeConfig) {
+    if (this.getKeyStroke(keyStrokeConfig.key()) != null) {
+      return false;
+    }
+
+    this.keyStrokes.get().add(keyStrokeConfig);
+    return true;
   }
 }
