@@ -67,21 +67,18 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   @SliderSetting(min = 20, max = 100)
   private final ConfigProperty<Integer> width = new ConfigProperty<>(20);
 
-  private Set<KeyStrokeConfig> keyStrokes = new HashSet<>();
+  private ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(new HashSet<>(),
+      set -> {
+        set.add(new KeyStrokeConfig(Key.W, this, 0, -22));
+        set.add(new KeyStrokeConfig(Key.A, this, -22, 0));
+        set.add(new KeyStrokeConfig(Key.S, this, 22, 22));
+        set.add(new KeyStrokeConfig(Key.D, this, 22, 0));
+      });
 
-  private Key base;
-
-  public KeyStrokesHudWidgetConfig() {
-    this.keyStrokes.add(new KeyStrokeConfig(Key.W, this, 0, -22));
-    this.keyStrokes.add(new KeyStrokeConfig(Key.A, this, -22, 0));
-    this.keyStrokes.add(new KeyStrokeConfig(Key.S, this, 0, 0));
-    this.keyStrokes.add(new KeyStrokeConfig(Key.D, this, 22, 0));
-
-    this.base = Key.S;
-  }
+  private ConfigProperty<Key> base = new ConfigProperty<>(Key.S);
 
   public Set<KeyStrokeConfig> getKeyStrokes() {
-    return this.keyStrokes;
+    return this.keyStrokes.get();
   }
 
   @MethodOrder(before = "pressedColor")
@@ -127,12 +124,16 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   }
 
   public KeyStrokeConfig getKeyStroke(Key key) {
-    for (KeyStrokeConfig keyStroke : this.keyStrokes) {
+    for (KeyStrokeConfig keyStroke : this.getKeyStrokes()) {
       if (keyStroke.key() == key) {
         return keyStroke;
       }
     }
 
     return null;
+  }
+
+  public ConfigProperty<Key> base() {
+    return this.base;
   }
 }

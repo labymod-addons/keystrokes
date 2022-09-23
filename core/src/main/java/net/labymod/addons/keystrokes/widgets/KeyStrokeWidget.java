@@ -70,7 +70,6 @@ public class KeyStrokeWidget extends SimpleWidget {
         .render(stack);
   }
 
-
   private int getBackgroundColor() {
     boolean pressed = this.keyStroke.isPressed();
     if (pressed) {
@@ -82,5 +81,13 @@ public class KeyStrokeWidget extends SimpleWidget {
 
   private int getTextColor() {
     return this.keyStroke.getTextColor();
+  }
+
+  public Key getKey() {
+    return this.key;
+  }
+
+  public KeyStrokeConfig getKeyStroke() {
+    return this.keyStroke;
   }
 }

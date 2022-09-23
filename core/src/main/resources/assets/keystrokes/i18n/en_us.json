@@ -6,6 +6,18 @@
         "name" : "Enabled"
       }
     },
+    "activity" : {
+      "edit" : {
+        "add" : {
+          "text" : "Add Key",
+          "title" : "Press any key you want to add...",
+          "exit" : "Press ESCAPE to cancel!"
+        },
+        "remove" : {
+          "text" : "Remove Key"
+        }
+      }
+    },
     "hudWidget" : {
       "keyStrokes" : {
         "name" : "KeyStrokes",

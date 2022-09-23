@@ -1,0 +1,69 @@
+.content {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin-bottom: 10;
+
+  .manage-container {
+    border: 1 gray;
+    .manage {
+    }
+  }
+
+  .manage-button-container {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 24;
+
+    .Button {
+       left: 0;
+       top: 0;
+    }
+
+    .add-button {
+      icon: sprite("common", 1, 1, 16);
+    }
+
+    .remove-button {
+      icon: sprite("common", 0, 0, 16);
+      color: red;
+    }
+  }
+}
+
+.overlay {
+  priority-layer: very-front;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 100);
+  margin-bottom: 10;
+
+  .overlay-content {
+    left: 50%;
+    top: 50%;
+    alignment-x: center;
+    alignment-y: center;
+
+    width: 70%;
+    height: fit-content;
+
+    * {
+      left: 50%;
+      alignment-x: center;
+    }
+
+    .title-add {
+      top: 0;
+      text-color: green;
+    }
+
+    .title-exit {
+      top: 12;
+      text-color: red;
+    }
+  }
+}
