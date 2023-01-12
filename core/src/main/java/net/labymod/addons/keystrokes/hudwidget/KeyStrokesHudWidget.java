@@ -66,7 +66,6 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
     }
 
     keyStroke.updatePressed(event.state() != State.UNPRESSED);
-    System.out.println("Key: " + event.key() + " State: " + event.state());
   }
 
   @Subscribe
@@ -77,6 +76,5 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
     }
 
     keyStroke.updatePressed(event.action() == Action.CLICK);
-    System.out.println("Button: " + event.button() + " State: " + event.action());
   }
 }
