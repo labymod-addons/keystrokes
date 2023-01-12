@@ -24,7 +24,6 @@ import net.labymod.api.client.gui.icon.Icon;
 import net.labymod.api.client.gui.lss.property.LssProperty;
 import net.labymod.api.client.gui.lss.property.annotation.AutoWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
-import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.MouseButton;
 import net.labymod.api.client.gui.screen.widget.Widget;
@@ -54,11 +53,6 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       Consumer<KeyStrokeConfig> selectConsumer) {
     super(config);
     this.selectConsumer = selectConsumer;
-  }
-
-  @Override
-  public void initialize(Parent parent) {
-    super.initialize(parent);
   }
 
   @Override

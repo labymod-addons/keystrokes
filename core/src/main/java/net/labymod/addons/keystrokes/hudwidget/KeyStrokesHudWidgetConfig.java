@@ -53,8 +53,8 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   @SwitchSetting
   private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
 
-  @SwitchSetting
-  private final ConfigProperty<Boolean> showCps = new ConfigProperty<>(false);
+  //@SwitchSetting
+  //private final ConfigProperty<Boolean> showCps = new ConfigProperty<>(false);
 
   @SliderSetting(min = 20, max = 100)
   private final ConfigProperty<Integer> width = new ConfigProperty<>(20);
@@ -98,9 +98,9 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return this.outline;
   }
 
-  public ConfigProperty<Boolean> showCps() {
-    return this.showCps;
-  }
+  //public ConfigProperty<Boolean> showCps() {
+  //  return this.showCps;
+  //}
 
   public ConfigProperty<Integer> width() {
     return this.width;

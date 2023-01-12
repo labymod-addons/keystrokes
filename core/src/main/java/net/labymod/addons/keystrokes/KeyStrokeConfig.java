@@ -40,7 +40,7 @@ public class KeyStrokeConfig {
   private Color textColor;
   private Color backgroundColor;
   private boolean outline;
-  private boolean showCps;
+  //private boolean showCps;
 
   private float width;
 
@@ -52,7 +52,7 @@ public class KeyStrokeConfig {
     this.textColor = config.textColor().get();
     this.backgroundColor = config.backgroundColor().get();
     this.outline = config.outline().get();
-    this.showCps = config.showCps().get();
+    //this.showCps = config.showCps().get();
     this.width = config.width().get();
     this.updateWidth(key);
 
@@ -97,9 +97,9 @@ public class KeyStrokeConfig {
     return this.outline;
   }
 
-  public boolean showingCps() {
-    return this.showCps;
-  }
+  //public boolean showingCps() {
+  //  return this.showCps;
+  //}
 
   public float getWidth() {
     return this.width;

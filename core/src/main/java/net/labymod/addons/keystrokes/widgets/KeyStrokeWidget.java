@@ -20,6 +20,7 @@ import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.mouse.MutableMouse;
+import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.SimpleWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
@@ -49,6 +50,11 @@ public class KeyStrokeWidget extends SimpleWidget {
   }
 
   @Override
+  public void initialize(Parent parent) {
+    super.initialize(parent);
+  }
+
+  @Override
   public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
     super.renderWidget(stack, mouse, partialTicks);
 
@@ -74,7 +80,8 @@ public class KeyStrokeWidget extends SimpleWidget {
   private int getBackgroundColor() {
     boolean pressed = this.keyStroke.isPressed();
     if (pressed) {
-      return this.getDefaultOr(this.defaultConfig.pressedColor(), this.keyStroke.getPressedColor());
+      return this.defaultConfig.pressedColor().get().get();
+      //return this.getDefaultOr(this.defaultConfig.pressedColor(), this.keyStroke.getPressedColor());
     }
 
     return this.getDefaultOr(this.defaultConfig.backgroundColor(),

@@ -187,7 +187,11 @@ public class KeyStrokesWidget extends SimpleWidget {
       widgetBounds.setSize(keyStroke.getWidth(), HEIGHT, REASON);
 
       if (this.reload) {
-        this.addChild(keyStrokeWidget);
+        if (this.initialized) {
+          this.addChildInitialized(keyStrokeWidget);
+        } else {
+          this.addChild(keyStrokeWidget);
+        }
       }
     }
 
