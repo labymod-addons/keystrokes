@@ -28,6 +28,7 @@ import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.font.text.TextRenderer;
 import net.labymod.api.client.render.matrix.Stack;
 import net.labymod.api.configuration.loader.property.ConfigProperty;
+import net.labymod.api.util.Color;
 
 public class KeyStrokeWidget extends SimpleWidget {
 
@@ -51,7 +52,7 @@ public class KeyStrokeWidget extends SimpleWidget {
   public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
     super.renderWidget(stack, mouse, partialTicks);
 
-    Bounds bounds = this.bounds;
+    Bounds bounds = this.bounds();
     RECTANGLE_RENDERER.pos(bounds.rectangle(BoundsType.OUTER)).color(this.getBackgroundColor())
         .render(stack);
     int textColor = this.getTextColor();
@@ -94,5 +95,9 @@ public class KeyStrokeWidget extends SimpleWidget {
 
   private <T> T getDefaultOr(ConfigProperty<T> property, T value) {
     return property.isDefaultValue(value) ? property.get() : value;
+  }
+
+  private int getDefaultOr(ConfigProperty<Color> property, Color value) {
+    return property.isDefaultValue(value) ? property.get().get() : value.get();
   }
 }

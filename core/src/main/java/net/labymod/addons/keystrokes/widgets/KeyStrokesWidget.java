@@ -14,11 +14,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package net.labymod.addons.keystrokes.hudwidget;
+package net.labymod.addons.keystrokes.widgets;
 
 import java.awt.*;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
-import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
+import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
@@ -27,9 +27,12 @@ import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.matrix.Stack;
+import net.labymod.api.util.bounds.ModifyReason;
 import net.labymod.api.util.bounds.Rectangle;
 
 public class KeyStrokesWidget extends SimpleWidget {
+
+  private static final ModifyReason REASON = ModifyReason.of("keyStrokeAdjustment");
 
   private static final float HEIGHT = 20;
 
@@ -48,11 +51,13 @@ public class KeyStrokesWidget extends SimpleWidget {
   @Override
   public void initialize(Parent parent) {
     super.initialize(parent);
-    this.bounds.setSize(20, 20);
+    Bounds bounds = this.parent.bounds();
+    this.bounds().setPosition(bounds.getX(), bounds.getY(), REASON);
+    this.bounds().setSize(20, 20, REASON);
 
     if (!this.isEditing()) {
       this.reload = true;
-      this.updateWidgetBounds(this.bounds);
+      this.updateWidgetBounds(this.bounds());
     }
   }
 
@@ -63,7 +68,7 @@ public class KeyStrokesWidget extends SimpleWidget {
   }
 
   protected void renderDebug(Stack stack) {
-    Bounds bounds = this.bounds;
+    Bounds bounds = this.bounds();
     RectangleRenderer rectangleRenderer = this.labyAPI.renderPipeline().rectangleRenderer();
     rectangleRenderer.renderOutline(stack, bounds, Color.RED.getRGB(), 1);
     rectangleRenderer.pos(bounds.getX(), bounds.getCenterY() - 0.5F, bounds.getMaxX(),
@@ -97,7 +102,7 @@ public class KeyStrokesWidget extends SimpleWidget {
     }
 
     this.reload = true;
-    this.updateWidgetBounds(this.bounds);
+    this.updateWidgetBounds(this.bounds());
   }
 
   protected void updateWidgetBounds(Rectangle bounds) {
@@ -178,17 +183,15 @@ public class KeyStrokesWidget extends SimpleWidget {
         widgetY = y + keyStroke.getY();
       }
 
-      widgetBounds.setX(widgetX);
-      widgetBounds.setY(widgetY);
-      widgetBounds.setHeight(HEIGHT);
-      widgetBounds.setWidth(keyStroke.getWidth());
+      widgetBounds.setPosition(widgetX, widgetY, REASON);
+      widgetBounds.setSize(keyStroke.getWidth(), HEIGHT, REASON);
 
       if (this.reload) {
         this.addChild(keyStrokeWidget);
       }
     }
 
-    this.bounds.setSize(width, height);
+    this.bounds().setSize(width, height, REASON);
     this.reload = false;
   }
 

@@ -3,7 +3,6 @@
   top: 0;
   right: 0;
   bottom: 0;
-  margin-bottom: 10;
 
   .manage-container {
     border: 1 gray;
@@ -15,11 +14,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: 24;
+    height: fit-content;
+    margin-top: 4;
 
-    .Button {
-       left: 0;
-       top: 0;
+    Button {
+      left: 0;
+      top: 0;
     }
 
     .add-button {
@@ -40,7 +40,6 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 100);
-  margin-bottom: 10;
 
   .overlay-content {
     left: 50%;

@@ -21,6 +21,7 @@ import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.render.font.text.TextRenderer;
+import net.labymod.api.util.Color;
 import net.labymod.api.util.Lazy;
 
 @SuppressWarnings("FieldMayBeFinal")
@@ -35,9 +36,9 @@ public class KeyStrokeConfig {
   private float x;
   private float y;
 
-  private int pressedColor;
-  private int textColor;
-  private int backgroundColor;
+  private Color pressedColor;
+  private Color textColor;
+  private Color backgroundColor;
   private boolean outline;
   private boolean showCps;
 
@@ -80,15 +81,15 @@ public class KeyStrokeConfig {
     return this.y;
   }
 
-  public int getPressedColor() {
+  public Color getPressedColor() {
     return this.pressedColor;
   }
 
-  public int getTextColor() {
+  public Color getTextColor() {
     return this.textColor;
   }
 
-  public int getBackgroundColor() {
+  public Color getBackgroundColor() {
     return this.backgroundColor;
   }
 

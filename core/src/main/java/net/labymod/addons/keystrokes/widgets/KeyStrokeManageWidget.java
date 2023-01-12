@@ -20,7 +20,6 @@ import java.awt.*;
 import java.util.function.Consumer;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
-import net.labymod.addons.keystrokes.hudwidget.KeyStrokesWidget;
 import net.labymod.api.client.gui.icon.Icon;
 import net.labymod.api.client.gui.lss.property.LssProperty;
 import net.labymod.api.client.gui.lss.property.annotation.AutoWidget;
@@ -32,10 +31,14 @@ import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.matrix.Stack;
+import net.labymod.api.util.bounds.ModifyReason;
 import net.labymod.api.util.bounds.Rectangle;
 
 @AutoWidget
 public class KeyStrokeManageWidget extends KeyStrokesWidget {
+
+
+  private static final ModifyReason REASON = ModifyReason.of("keyStrokeUpdate");
 
   private static final Key CLICK_KEY = MouseButton.LEFT;
   private static final long DRAGGING_DELAY = 100L;
@@ -68,8 +71,8 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
   protected void updateWidgetBounds(Rectangle bounds) {
     super.updateWidgetBounds(bounds);
     Bounds parentBounds = this.parent.bounds();
-    this.bounds.setPosition(parentBounds.getCenterX() - bounds.getWidth() / 2,
-        parentBounds.getCenterY() - bounds.getHeight() / 2);
+    this.bounds().setPosition(parentBounds.getCenterX() - bounds.getWidth() / 2,
+        parentBounds.getCenterY() - bounds.getHeight() / 2, REASON);
   }
 
   @Override
@@ -96,7 +99,7 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       child.render(stack, mouse, partialTicks);
     }
 
-    Bounds parentBounds = this.bounds;
+    Bounds parentBounds = this.bounds();
     Bounds bounds = this.editing.bounds();
     float x = mouse.getX() - this.offsetX;
     if (x < parentBounds.getX()) {
@@ -112,14 +115,14 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       y = parentBounds.getMaxY() - bounds.getHeight();
     }
 
-    bounds.setOuterPosition(x, y);
+    bounds.setOuterPosition(x, y, REASON);
 
     this.editing.render(stack, mouse, partialTicks);
     this.highlightEditing(stack);
   }
 
   private void highlightEditing(Stack stack) {
-    Bounds parentBounds = this.bounds;
+    Bounds parentBounds = this.bounds();
     Bounds bounds = this.editing.bounds();
     RectangleRenderer rectangleRenderer = this.labyAPI.renderPipeline().rectangleRenderer();
     rectangleRenderer.pos(parentBounds.getX(), bounds.getCenterY() - 0.5F, bounds.getX(),

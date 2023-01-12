@@ -16,31 +16,67 @@
 
 package net.labymod.addons.keystrokes.hudwidget;
 
+import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.KeyStrokes;
-import net.labymod.api.client.gui.hud.HudWidget;
-import net.labymod.api.client.gui.hud.annotation.HudWidgetTypeProvider;
-import net.labymod.api.client.gui.hud.category.HudWidgetMiscellaneousCategory;
-import net.labymod.api.client.gui.hud.info.HudWidgetInfo;
-import net.labymod.api.inject.LabyGuice;
-import org.jetbrains.annotations.NotNull;
+import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
+import net.labymod.api.client.gui.hud.hudwidget.widget.WidgetHudWidget;
+import net.labymod.api.client.gui.screen.widget.AbstractWidget;
+import net.labymod.api.client.gui.screen.widget.Widget;
+import net.labymod.api.event.Subscribe;
+import net.labymod.api.event.client.input.KeyEvent;
+import net.labymod.api.event.client.input.KeyEvent.State;
+import net.labymod.api.event.client.input.MouseButtonEvent;
+import net.labymod.api.event.client.input.MouseButtonEvent.Action;
+import net.labymod.api.util.bounds.Rectangle;
 
-@HudWidgetTypeProvider(
-    typeId = "keyStrokes",
-    categoryClass = HudWidgetMiscellaneousCategory.class,
-    configClass = KeyStrokesHudWidgetConfig.class
-)
-public class KeyStrokesHudWidget extends HudWidget<KeyStrokesWidget, KeyStrokesHudWidgetConfig> {
+public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConfig> {
 
-  private static final KeyStrokes KEY_STROKES = LabyGuice.getInstance(KeyStrokes.class);
+  private final KeyStrokes keyStrokes;
+  private KeyStrokesWidget keyStrokesWidget;
 
-  protected KeyStrokesHudWidget(
-      @NotNull HudWidgetInfo info,
-      @NotNull KeyStrokesHudWidgetConfig config
-  ) {
-    super(info, config, () -> {
-      KeyStrokesWidget widget = new KeyStrokesWidget(config);
-      config.setWidget(widget);
-      return widget;
-    });
+  public KeyStrokesHudWidget(KeyStrokes keyStrokes) {
+    super("keyStrokes", KeyStrokesHudWidgetConfig.class);
+    this.keyStrokes = keyStrokes;
+  }
+
+  @Override
+  public void initialize(AbstractWidget<Widget> widget) {
+    super.initialize(widget);
+    this.keyStrokesWidget = new KeyStrokesWidget(this.config);
+    this.config.setWidget(this.keyStrokesWidget);
+    widget.addChild(this.keyStrokesWidget);
+  }
+
+  @Override
+  public void onBoundsChanged(AbstractWidget<Widget> widget, Rectangle newRect) {
+    this.keyStrokesWidget.reInitialize();
+    super.onBoundsChanged(widget, newRect);
+  }
+
+  @Override
+  public boolean isVisibleInGame() {
+    return true;
+  }
+
+  @Subscribe
+  public void onKey(KeyEvent event) {
+    KeyStrokeConfig keyStroke = this.getConfig().getKeyStroke(event.key());
+    if (keyStroke == null) {
+      return;
+    }
+
+    keyStroke.updatePressed(event.state() != State.UNPRESSED);
+    System.out.println("Key: " + event.key() + " State: " + event.state());
+  }
+
+  @Subscribe
+  public void onMouseButton(MouseButtonEvent event) {
+    KeyStrokeConfig keyStroke = this.getConfig().getKeyStroke(event.button());
+    if (keyStroke == null) {
+      return;
+    }
+
+    keyStroke.updatePressed(event.action() == Action.CLICK);
+    System.out.println("Button: " + event.button() + " State: " + event.action());
   }
 }

@@ -16,12 +16,12 @@
 
 package net.labymod.addons.keystrokes.hudwidget;
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.activities.HudWidgetEditActivity;
-import net.labymod.api.client.gui.hud.config.HudWidgetConfig;
+import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
+import net.labymod.api.client.gui.hud.hudwidget.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.widgets.activity.settings.AddonActivityWidget.AddonActivitySetting;
@@ -29,24 +29,25 @@ import net.labymod.api.client.gui.screen.widget.widgets.input.SliderWidget.Slide
 import net.labymod.api.client.gui.screen.widget.widgets.input.SwitchWidget.SwitchSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.color.ColorPickerWidget.ColorPickerSetting;
 import net.labymod.api.configuration.loader.property.ConfigProperty;
+import net.labymod.api.util.Color;
 import net.labymod.api.util.MethodOrder;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
-  @ColorPickerSetting
-  private final ConfigProperty<Integer> pressedColor = new ConfigProperty<>(
-      new Color(255, 255, 255, 255).getRGB()
+  @ColorPickerSetting(chroma = true, alpha = true)
+  private final ConfigProperty<Color> pressedColor = new ConfigProperty<>(
+      Color.ofRGB(255, 255, 255, 150)
   );
 
-  @ColorPickerSetting
-  private final ConfigProperty<Integer> textColor = new ConfigProperty<>(
-      new Color(255, 255, 255, 255).getRGB()
+  @ColorPickerSetting(chroma = true, alpha = true)
+  private final ConfigProperty<Color> textColor = new ConfigProperty<>(
+      Color.ofRGB(255, 255, 255, 255)
   );
 
-  @ColorPickerSetting(alpha = true)
-  private final ConfigProperty<Integer> backgroundColor = new ConfigProperty<>(
-      new Color(0, 0, 0, 155).getRGB()
+  @ColorPickerSetting(chroma = true, alpha = true)
+  private final ConfigProperty<Color> backgroundColor = new ConfigProperty<>(
+      Color.ofRGB(0, 0, 0, 155)
   );
 
   @SwitchSetting
@@ -81,15 +82,15 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return new HudWidgetEditActivity(this);
   }
 
-  public ConfigProperty<Integer> pressedColor() {
+  public ConfigProperty<Color> pressedColor() {
     return this.pressedColor;
   }
 
-  public ConfigProperty<Integer> textColor() {
+  public ConfigProperty<Color> textColor() {
     return this.textColor;
   }
 
-  public ConfigProperty<Integer> backgroundColor() {
+  public ConfigProperty<Color> backgroundColor() {
     return this.backgroundColor;
   }
 
