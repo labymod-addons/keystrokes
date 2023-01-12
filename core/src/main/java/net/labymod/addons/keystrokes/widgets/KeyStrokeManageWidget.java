@@ -170,7 +170,6 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
   @Override
   public boolean mouseReleased(MutableMouse mouse, MouseButton mouseButton) {
-    System.out.println("MouseReleased");
     if (this.editing == null || this.dragStartTime == -1) {
       return false;
     }

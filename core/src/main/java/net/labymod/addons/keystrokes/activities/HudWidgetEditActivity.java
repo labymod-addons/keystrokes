@@ -45,13 +45,16 @@ public class HudWidgetEditActivity extends Activity {
   private FlexibleContentWidget content;
   private final KeyStrokeManageWidget manageWidget;
   private DivWidget overlayWidget;
+  private KeyStrokeConfig selected;
 
   public HudWidgetEditActivity(KeyStrokesHudWidgetConfig hudWidgetConfig) {
     this.hudWidgetConfig = hudWidgetConfig;
 
     this.manageWidget = new KeyStrokeManageWidget(this.hudWidgetConfig, selected -> {
+      this.selected = selected;
       if (selected == null) {
         System.out.println("Unselect");
+        return;
       }
 
       System.out.println("Selected " + selected.key().getName());
@@ -182,8 +185,8 @@ public class HudWidgetEditActivity extends Activity {
   }
 
   @Override
-  public boolean shouldDocumentHandleKey(Key key, InputType type) {
-    return key != Key.ESCAPE || (this.overlayWidget != null && this.overlayWidget.isVisible());
+  public boolean shouldHandleEscape() {
+    return this.overlayWidget != null && this.overlayWidget.isVisible();
   }
 
   @Override

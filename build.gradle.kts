@@ -78,7 +78,7 @@ addon {
     }
 
     dev {
-        releaseChannel = "develop"
+        releaseChannel = "improvement-components"
         commitReference = "unknown"
     }
 
