@@ -23,8 +23,7 @@ import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
-import net.labymod.api.client.gui.screen.widget.SimpleWidget;
-import net.labymod.api.client.gui.screen.widget.Widget;
+import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.matrix.Stack;
@@ -32,13 +31,13 @@ import net.labymod.api.util.bounds.ModifyReason;
 import net.labymod.api.util.bounds.Point;
 import net.labymod.api.util.bounds.Rectangle;
 
-public class KeyStrokesWidget extends SimpleWidget {
+public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
 
   private static final ModifyReason REASON = ModifyReason.of("keyStrokeAdjustment");
 
-  private static final float HEIGHT = 20;
+  public static final float HEIGHT = 20;
 
-  private final KeyStrokesHudWidgetConfig hudWidgetConfig;
+  protected final KeyStrokesHudWidgetConfig hudWidgetConfig;
   private boolean reload;
 
   protected float x;
@@ -77,24 +76,22 @@ public class KeyStrokesWidget extends SimpleWidget {
     rectangleRenderer.pos(bounds.getCenterX() - 0.5F, bounds.getY(), bounds.getCenterX() + 0.5F,
         bounds.getMaxY()).color(Color.RED.getRGB()).render(stack);
 
-    for (Widget child : this.children) {
-      if (child instanceof KeyStrokeWidget) {
-        KeyStrokeWidget keyStrokeWidget = (KeyStrokeWidget) child;
-        if (keyStrokeWidget.getKey() != this.hudWidgetConfig.base().get()) {
-          continue;
-        }
-
-        KeyStrokeConfig config = keyStrokeWidget.getKeyStroke();
-        rectangleRenderer.renderOutline(stack, child.bounds(), Color.YELLOW.getRGB(), 1);
-
-        rectangleRenderer
-            .pos(child.bounds().getX() - config.getX(), child.bounds().getY() - config.getY())
-            .size(1)
-            .color(Color.YELLOW.getRGB())
-            .render(stack);
-        break;
-      }
+    Key key = this.hudWidgetConfig.base().get();
+    KeyStrokeWidget anchorWidget = this.findFirstChildIf(child -> child.key() == key);
+    if (anchorWidget == null) {
+      return;
     }
+
+    KeyStrokeConfig config = anchorWidget.config();
+    //rectangleRenderer.renderOutline(stack, anchorWidget.bounds(), Color.YELLOW.getRGB(), 1);
+
+    rectangleRenderer
+        .pos(anchorWidget.bounds().getX() - config.getX(),
+            anchorWidget.bounds().getY() - config.getY()
+        )
+        .size(1)
+        .color(Color.YELLOW.getRGB())
+        .render(stack);
   }
 
   public void checkForNewKeyStrokes() {
@@ -114,6 +111,11 @@ public class KeyStrokesWidget extends SimpleWidget {
     if (this.reload) {
       this.children.clear();
     }
+
+    this.x = 0;
+    this.y = 0;
+    this.maxX = 0;
+    this.maxY = 0;
 
     KeyStrokeConfig anchor = this.hudWidgetConfig.getKeyStroke(this.hudWidgetConfig.base().get());
     anchor.updateWidth(anchor.key());
@@ -170,17 +172,9 @@ public class KeyStrokesWidget extends SimpleWidget {
       if (this.reload) {
         keyStrokeWidget = new KeyStrokeWidget(keyStroke.key(), keyStroke, this.hudWidgetConfig);
       } else {
-        for (Widget child : this.children) {
-          if (child instanceof KeyStrokeWidget) {
-            KeyStrokeWidget widget = (KeyStrokeWidget) child;
-            if (widget.getKeyStroke() == keyStroke) {
-              keyStrokeWidget = widget;
-              break;
-            }
-          }
-        }
-
+        keyStrokeWidget = this.findFirstChildIf(child -> child.config() == keyStroke);
         if (keyStrokeWidget == null) {
+          System.out.println("could not find widget for key " + keyStroke.key());
           break;
         }
       }
@@ -219,7 +213,12 @@ public class KeyStrokesWidget extends SimpleWidget {
   @Override
   public void onBoundsChanged(Rectangle previousRect, Rectangle bounds) {
     super.onBoundsChanged(previousRect, bounds);
-    this.updateWidgetBounds(bounds);
+
+    try {
+      this.updateWidgetBounds(bounds);
+    } catch (StackOverflowError ignored) {
+      ignored.printStackTrace();
+    }
   }
 
   public float getX() {

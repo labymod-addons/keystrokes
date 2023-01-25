@@ -18,42 +18,27 @@ package net.labymod.addons.keystrokes;
 
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
+import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.render.font.text.TextRenderer;
-import net.labymod.api.util.Color;
-import net.labymod.api.util.Lazy;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class KeyStrokeConfig {
 
-  private static final Lazy<TextRenderer> TEXT_RENDERER = Lazy.of(
-      () -> Laby.labyAPI().renderPipeline()
-          .textRenderer());
+  private static final TextRenderer TEXT_RENDERER = Laby.labyAPI().renderPipeline().textRenderer();
 
   private Key key;
 
   private float x;
   private float y;
 
-  private Color pressedColor;
-  private Color textColor;
-  private Color backgroundColor;
-  private boolean outline;
-  //private boolean showCps;
-
-  private float width;
+  private float width = KeyStrokesWidget.HEIGHT;
 
   private transient boolean pressed;
 
   public KeyStrokeConfig(Key key, KeyStrokesHudWidgetConfig config, float x, float y) {
     this.key = key;
-    this.pressedColor = config.pressedColor().get();
-    this.textColor = config.textColor().get();
-    this.backgroundColor = config.backgroundColor().get();
-    this.outline = config.outline().get();
-    //this.showCps = config.showCps().get();
-    this.width = config.width().get();
     this.updateWidth(key);
 
     this.x = x;
@@ -66,7 +51,7 @@ public class KeyStrokeConfig {
   }
 
   public void updateWidth(Key key) {
-    float width = TEXT_RENDERER.get().width(key.getName());
+    float width = TEXT_RENDERER.width(key.getName());
     int padding = KeyStrokeWidget.PADDING * 2;
     if (this.width < width + padding) {
       this.width = width + padding;
@@ -81,32 +66,17 @@ public class KeyStrokeConfig {
     return this.y;
   }
 
-  public Color getPressedColor() {
-    return this.pressedColor;
-  }
-
-  public Color getTextColor() {
-    return this.textColor;
-  }
-
-  public Color getBackgroundColor() {
-    return this.backgroundColor;
-  }
-
-  public boolean hasOutline() {
-    return this.outline;
-  }
-
-  //public boolean showingCps() {
-  //  return this.showCps;
-  //}
-
   public float getWidth() {
     return this.width;
   }
 
   public boolean isPressed() {
     return this.pressed;
+  }
+
+  public void updatePosition(float x, float y) {
+    this.x = x;
+    this.y = y;
   }
 
   public Key key() {

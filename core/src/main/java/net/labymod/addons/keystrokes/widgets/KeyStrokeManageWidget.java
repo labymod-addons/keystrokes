@@ -26,6 +26,7 @@ import net.labymod.api.client.gui.lss.property.annotation.AutoWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.MouseButton;
+import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
@@ -37,7 +38,6 @@ import net.labymod.api.util.bounds.Rectangle;
 @AutoWidget
 public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
-
   private static final ModifyReason REASON = ModifyReason.of("keyStrokeUpdate");
 
   private static final Key CLICK_KEY = MouseButton.LEFT;
@@ -45,7 +45,11 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
   private final LssProperty<Icon> anchorIcon = new LssProperty<>(null);
   private final Consumer<KeyStrokeConfig> selectConsumer;
+
   private KeyStrokeWidget editing;
+  private float startX;
+  private float startY;
+
   private float offsetX;
   private float offsetY;
   private long dragStartTime;
@@ -143,32 +147,22 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       return false;
     }
 
-    KeyStrokeWidget clicked = null;
-    for (Widget child : this.children) {
-      if (!(child instanceof KeyStrokeWidget)) {
-        continue;
-      }
-
-      KeyStrokeWidget keyStrokeWidget = (KeyStrokeWidget) child;
-      if (keyStrokeWidget.isHovered()) {
-        clicked = keyStrokeWidget;
-        break;
-      }
-    }
-
+    KeyStrokeWidget clicked = this.findFirstChildIf(AbstractWidget::isHovered);
     if (this.editing == null && clicked == null) {
       return false;
     }
 
     this.editing = clicked;
-    this.selectConsumer.accept(clicked == null ? null : clicked.getKeyStroke());
+    this.selectConsumer.accept(clicked == null ? null : clicked.config());
 
     if (clicked == null) {
       return false;
     }
 
-    this.offsetX = mouse.getX() - this.editing.bounds().getX();
-    this.offsetY = mouse.getY() - this.editing.bounds().getY();
+    this.startX = this.editing.bounds().getX();
+    this.offsetX = mouse.getX() - this.startX;
+    this.startY = this.editing.bounds().getY();
+    this.offsetY = mouse.getY() - this.startY;
     this.dragStartTime = System.currentTimeMillis();
     return true;
   }
@@ -179,7 +173,16 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       return false;
     }
 
+    long dragStartTime = this.dragStartTime;
     this.dragStartTime = -1;
+    if (System.currentTimeMillis() < dragStartTime + DRAGGING_DELAY) {
+      return true;
+    }
+
+    if (this.updateKeyStrokePosition(this.editing)) {
+      this.hudWidgetConfig.widget().checkForNewKeyStrokes();
+    }
+
     return true;
   }
 
@@ -198,17 +201,96 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       return;
     }
 
-    for (Widget child : this.children) {
-      if (!(child instanceof KeyStrokeWidget)) {
+    KeyStrokeWidget keyStrokeWidget = this.findFirstChildIf(
+        child -> child.config() == keyStrokeConfig
+    );
+
+    if (keyStrokeWidget != null) {
+      this.editing = keyStrokeWidget;
+      this.dragStartTime = -1;
+    }
+  }
+
+  private boolean updateKeyStrokePosition(KeyStrokeWidget widget) {
+    Bounds keyStrokeBounds = widget.bounds();
+    float x = keyStrokeBounds.getX();
+    float y = keyStrokeBounds.getY();
+
+    Key key = widget.key();
+    Key anchorKey = this.hudWidgetConfig.base().get();
+    KeyStrokeConfig anchorConfig = this.hudWidgetConfig.getKeyStroke(anchorKey);
+    if (key == anchorKey) {
+      return this.updateAnchorPosition(anchorConfig, x, y);
+    }
+
+    Widget anchor = this.findFirstChildIf(child -> child.config() == anchorConfig);
+    if (anchor == null) {
+      return false;
+    }
+
+    Bounds anchorBounds = anchor.bounds();
+    float anchorX = anchorBounds.getX();
+    float anchorY = anchorBounds.getY();
+
+    float newX = x - anchorX;
+    float newY = y - anchorY;
+    KeyStrokeConfig config = widget.config();
+    if (config.getX() == newX && config.getY() == newY) {
+      return false;
+    }
+
+    System.out.println(
+        "Update " + key + " from x:" + config.getX() + " y:" + config.getY() + " to x:" + newX
+            + " y:" + newY);
+
+    config.updatePosition(newX, newY);
+    this.updateSize();
+    return true;
+  }
+
+  private boolean updateAnchorPosition(KeyStrokeConfig anchor, float x, float y) {
+
+    return true;
+  }
+
+  private void updateSize() {
+    float minX = 0;
+    float minY = 0;
+    float maxX = 0;
+    float maxY = 0;
+
+    KeyStrokeConfig anchorConfig = null;
+    Key key = this.hudWidgetConfig.base().get();
+    for (KeyStrokeConfig keyStrokeConfig : this.hudWidgetConfig.getKeyStrokes()) {
+      if (keyStrokeConfig.key() == key) {
+        anchorConfig = keyStrokeConfig;
         continue;
       }
 
-      KeyStrokeWidget keyStrokeWidget = (KeyStrokeWidget) child;
-      if (keyStrokeWidget.getKeyStroke() == keyStrokeConfig) {
-        this.editing = keyStrokeWidget;
-        this.dragStartTime = -1;
-        return;
+      if (minX > keyStrokeConfig.getX()) {
+        minX = keyStrokeConfig.getX();
+      }
+
+      if (minY > keyStrokeConfig.getY()) {
+        minY = keyStrokeConfig.getY();
+      }
+
+      if (maxX < keyStrokeConfig.getX()) {
+        maxX = keyStrokeConfig.getX();
+      }
+
+      if (maxY < keyStrokeConfig.getY()) {
+        maxY = keyStrokeConfig.getY();
       }
     }
+
+    if (anchorConfig == null) {
+      return;
+    }
+
+    anchorConfig.updatePosition(
+        -minX,
+        -minY
+    );
   }
 }

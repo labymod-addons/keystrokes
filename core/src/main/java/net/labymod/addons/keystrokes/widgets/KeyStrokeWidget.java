@@ -20,7 +20,6 @@ import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.mouse.MutableMouse;
-import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.SimpleWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
@@ -28,8 +27,6 @@ import net.labymod.api.client.gui.screen.widget.attributes.bounds.BoundsType;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.font.text.TextRenderer;
 import net.labymod.api.client.render.matrix.Stack;
-import net.labymod.api.configuration.loader.property.ConfigProperty;
-import net.labymod.api.util.Color;
 
 public class KeyStrokeWidget extends SimpleWidget {
 
@@ -50,11 +47,6 @@ public class KeyStrokeWidget extends SimpleWidget {
   }
 
   @Override
-  public void initialize(Parent parent) {
-    super.initialize(parent);
-  }
-
-  @Override
   public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
     super.renderWidget(stack, mouse, partialTicks);
 
@@ -62,7 +54,7 @@ public class KeyStrokeWidget extends SimpleWidget {
     RECTANGLE_RENDERER.pos(bounds.rectangle(BoundsType.OUTER)).color(this.getBackgroundColor())
         .render(stack);
     int textColor = this.getTextColor();
-    if (this.getDefaultOr(this.defaultConfig.outline(), this.keyStroke.hasOutline())) {
+    if (this.defaultConfig.outline().get()) {
       RECTANGLE_RENDERER.renderOutline(stack, bounds.getX() + 1, bounds.getY() + 1,
           bounds.getMaxX() - 1, bounds.getMaxY() - 1, textColor, 1);
     }
@@ -81,30 +73,20 @@ public class KeyStrokeWidget extends SimpleWidget {
     boolean pressed = this.keyStroke.isPressed();
     if (pressed) {
       return this.defaultConfig.pressedColor().get().get();
-      //return this.getDefaultOr(this.defaultConfig.pressedColor(), this.keyStroke.getPressedColor());
     }
 
-    return this.getDefaultOr(this.defaultConfig.backgroundColor(),
-        this.keyStroke.getBackgroundColor());
+    return this.defaultConfig.backgroundColor().get().get();
   }
 
   private int getTextColor() {
-    return this.getDefaultOr(this.defaultConfig.textColor(), this.keyStroke.getTextColor());
+    return this.defaultConfig.textColor().get().get();
   }
 
-  public Key getKey() {
+  public Key key() {
     return this.key;
   }
 
-  public KeyStrokeConfig getKeyStroke() {
+  public KeyStrokeConfig config() {
     return this.keyStroke;
-  }
-
-  private <T> T getDefaultOr(ConfigProperty<T> property, T value) {
-    return property.isDefaultValue(value) ? property.get() : value;
-  }
-
-  private int getDefaultOr(ConfigProperty<Color> property, Color value) {
-    return property.isDefaultValue(value) ? property.get().get() : value.get();
   }
 }

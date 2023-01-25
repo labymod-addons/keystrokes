@@ -25,7 +25,6 @@ import net.labymod.api.client.gui.hud.hudwidget.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.widgets.activity.settings.AddonActivityWidget.AddonActivitySetting;
-import net.labymod.api.client.gui.screen.widget.widgets.input.SliderWidget.SliderSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.SwitchWidget.SwitchSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.color.ColorPickerWidget.ColorPickerSetting;
 import net.labymod.api.configuration.loader.property.ConfigProperty;
@@ -52,12 +51,6 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   @SwitchSetting
   private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
-
-  //@SwitchSetting
-  //private final ConfigProperty<Boolean> showCps = new ConfigProperty<>(false);
-
-  @SliderSetting(min = 20, max = 100)
-  private final ConfigProperty<Integer> width = new ConfigProperty<>(20);
 
   private final ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(
       new HashSet<>(),
@@ -96,14 +89,6 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   public ConfigProperty<Boolean> outline() {
     return this.outline;
-  }
-
-  //public ConfigProperty<Boolean> showCps() {
-  //  return this.showCps;
-  //}
-
-  public ConfigProperty<Integer> width() {
-    return this.width;
   }
 
   public KeyStrokeConfig getKeyStroke(Key key) {

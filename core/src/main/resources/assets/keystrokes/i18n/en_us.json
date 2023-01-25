@@ -25,31 +25,16 @@
           "name" : "Edit Layout"
         },
         "pressedColor" : {
-          "name" : "Default Color When Pressed"
+          "name": "Color When Pressed"
         },
         "textColor" : {
-          "name" : "Default Text Color"
-        },
-        "textRgb" : {
-          "name" : "Default Text RGB"
+          "name": "Text Color"
         },
         "backgroundColor" : {
-          "name" : "Default Background Color"
-        },
-        "backgroundRgb" : {
-          "name" : "Default Background RGB"
+          "name": "Background Color"
         },
         "outline" : {
-          "name" : "Default Outline"
-        },
-        "showCps" : {
-          "name" : "Default Show CPS"
-        },
-        "rgbSpeed" : {
-          "name" : "Default RGB Speed"
-        },
-        "width" : {
-          "name" : "Default Width"
+          "name": "Outline"
         }
       }
     }

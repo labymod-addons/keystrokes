@@ -196,24 +196,6 @@ public class HudWidgetEditActivity extends Activity {
     return true;
   }
 
-/*  @Override
-  public boolean mouseScrolled(MutableMouse mouse, double scrollDelta) {
-    if(!this.content.isHovered() || (this.overlayWidget != null && this.overlayWidget.isVisible())) {
-      return super.mouseScrolled(mouse, scrollDelta);
-    }
-
-    double scale = this.scale + (scrollDelta < 0 ? -0.05d : 0.05d);
-    if (scale < 0.5) {
-      scale = 0.5f;
-    } else if (scale > 2.0) {
-      scale = 2.0f;
-    }
-
-    this.scale = (float) scale;
-    this.manageWidget.setScale(this.scale);
-    return super.mouseScrolled(mouse, scrollDelta);
-  } */
-
   @Override
   public boolean shouldHandleEscape() {
     return this.overlayWidget != null && this.overlayWidget.isVisible();
