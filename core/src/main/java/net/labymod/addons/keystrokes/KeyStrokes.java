@@ -16,13 +16,11 @@
 
 package net.labymod.addons.keystrokes;
 
-import javax.inject.Singleton;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidget;
 import net.labymod.api.addon.LabyAddon;
-import net.labymod.api.models.addon.annotation.AddonListener;
+import net.labymod.api.models.addon.annotation.AddonMain;
 
-@Singleton
-@AddonListener
+@AddonMain
 public class KeyStrokes extends LabyAddon<KeyStrokesConfiguration> {
 
   @Override
