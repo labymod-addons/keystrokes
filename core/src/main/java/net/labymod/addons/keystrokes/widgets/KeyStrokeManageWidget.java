@@ -31,6 +31,7 @@ import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.matrix.Stack;
 import net.labymod.api.util.bounds.ModifyReason;
+import net.labymod.api.util.bounds.Point;
 import net.labymod.api.util.bounds.Rectangle;
 
 @AutoWidget
@@ -63,10 +64,14 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
   @Override
   protected void updateWidgetBounds(Rectangle bounds) {
-    super.updateWidgetBounds(bounds);
-    Bounds parentBounds = this.parent.bounds();
-    this.bounds().setPosition(parentBounds.getCenterX() - bounds.getWidth() / 2,
-        parentBounds.getCenterY() - bounds.getHeight() / 2, REASON);
+    this.updateWidgetBounds(
+        Point.fixed(
+            (int) bounds.getCenterX(),
+            (int) bounds.getCenterY()
+        ),
+        false,
+        true
+    );
   }
 
   @Override

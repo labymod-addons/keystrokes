@@ -17,6 +17,7 @@
 package net.labymod.addons.keystrokes.widgets;
 
 import java.awt.*;
+import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.api.client.gui.mouse.MutableMouse;
@@ -28,6 +29,7 @@ import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.matrix.Stack;
 import net.labymod.api.util.bounds.ModifyReason;
+import net.labymod.api.util.bounds.Point;
 import net.labymod.api.util.bounds.Rectangle;
 
 public class KeyStrokesWidget extends SimpleWidget {
@@ -51,11 +53,10 @@ public class KeyStrokesWidget extends SimpleWidget {
   @Override
   public void initialize(Parent parent) {
     super.initialize(parent);
-    Bounds bounds = this.parent.bounds();
-    this.bounds().setPosition(bounds.getX(), bounds.getY(), REASON);
-    this.bounds().setSize(20, 20, REASON);
-
     if (!this.isEditing()) {
+      Bounds bounds = this.parent.bounds();
+      this.bounds().setPosition(bounds.getX(), bounds.getY(), REASON);
+      this.bounds().setSize(20, 20, REASON);
       this.reload = true;
       this.updateWidgetBounds(this.bounds());
     }
@@ -106,6 +107,10 @@ public class KeyStrokesWidget extends SimpleWidget {
   }
 
   protected void updateWidgetBounds(Rectangle bounds) {
+    this.updateWidgetBounds(Point.fixed((int) bounds.getX(), (int) bounds.getY()), true, false);
+  }
+
+  protected void updateWidgetBounds(Point point, boolean adjustBounds, boolean centered) {
     if (this.reload) {
       this.children.clear();
     }
@@ -116,23 +121,23 @@ public class KeyStrokesWidget extends SimpleWidget {
     float anchorX = anchor.getX();
     float anchorY = anchor.getY();
 
-    float x = bounds.getX() + anchorX;
-    float y = bounds.getY() + anchorY;
-
     float width = anchorX + anchor.getWidth();
     float height = anchorY + HEIGHT;
 
-    for (KeyStrokeConfig keyStroke : this.hudWidgetConfig.getKeyStrokes()) {
+    Set<KeyStrokeConfig> keyStrokes = this.hudWidgetConfig.getKeyStrokes();
+    for (KeyStrokeConfig keyStroke : keyStrokes) {
       Key key = keyStroke.key();
       if (keyStroke != anchor) {
         keyStroke.updateWidth(key);
 
-        if (keyStroke.getX() >= 0 && width < anchorX + keyStroke.getX() + keyStroke.getWidth()) {
-          width = anchorX + keyStroke.getX() + keyStroke.getWidth();
-        }
+        if (adjustBounds) {
+          if (keyStroke.getX() >= 0 && width < anchorX + keyStroke.getX() + keyStroke.getWidth()) {
+            width = anchorX + keyStroke.getX() + keyStroke.getWidth();
+          }
 
-        if (keyStroke.getY() >= 0 && height < anchorY + keyStroke.getY() + HEIGHT) {
-          height = anchorY + keyStroke.getY() + HEIGHT;
+          if (keyStroke.getY() >= 0 && height < anchorY + keyStroke.getY() + HEIGHT) {
+            height = anchorY + keyStroke.getY() + HEIGHT;
+          }
         }
 
         if (this.x > keyStroke.getX()) {
@@ -151,10 +156,19 @@ public class KeyStrokesWidget extends SimpleWidget {
           this.maxY = keyStroke.getY() + HEIGHT;
         }
       }
+    }
 
+    float x = point.getX() + anchorX;
+    float y = point.getY() + anchorY;
+    if (centered) {
+      x -= (this.maxX - this.x) / 2;
+      y -= (this.maxY - this.y) / 2;
+    }
+
+    for (KeyStrokeConfig keyStroke : keyStrokes) {
       KeyStrokeWidget keyStrokeWidget = null;
       if (this.reload) {
-        keyStrokeWidget = new KeyStrokeWidget(key, keyStroke, this.hudWidgetConfig);
+        keyStrokeWidget = new KeyStrokeWidget(keyStroke.key(), keyStroke, this.hudWidgetConfig);
       } else {
         for (Widget child : this.children) {
           if (child instanceof KeyStrokeWidget) {
@@ -195,7 +209,10 @@ public class KeyStrokesWidget extends SimpleWidget {
       }
     }
 
-    this.bounds().setSize(width, height, REASON);
+    if (adjustBounds) {
+      this.bounds().setSize(width, height, REASON);
+    }
+
     this.reload = false;
   }
 
