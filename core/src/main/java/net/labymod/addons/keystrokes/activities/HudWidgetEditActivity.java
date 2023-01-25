@@ -46,6 +46,7 @@ public class HudWidgetEditActivity extends Activity {
   private final KeyStrokeManageWidget manageWidget;
   private DivWidget overlayWidget;
   private KeyStrokeConfig selected;
+  //private float scale = 1;
 
   public HudWidgetEditActivity(KeyStrokesHudWidgetConfig hudWidgetConfig) {
     this.hudWidgetConfig = hudWidgetConfig;
@@ -67,16 +68,18 @@ public class HudWidgetEditActivity extends Activity {
   public void initialize(Parent parent) {
     super.initialize(parent);
 
-    this.overlayWidget = this.overlayWidget();
-    this.overlayWidget.addId("overlay");
-    this.overlayWidget.setVisible(false);
-    this.document.addChild(this.overlayWidget);
+    //this.manageWidget.setScale(this.scale);
 
     this.content = new FlexibleContentWidget();
     this.content.addId("content");
 
     DivWidget manageContainer = new DivWidget();
     manageContainer.addId("manage-container");
+
+    this.overlayWidget = this.overlayWidget();
+    this.overlayWidget.addId("overlay");
+    this.overlayWidget.setVisible(false);
+    manageContainer.addChild(this.overlayWidget);
 
     manageContainer.addChild(this.manageWidget);
     this.content.addFlexibleContent(manageContainer);
@@ -92,6 +95,15 @@ public class HudWidgetEditActivity extends Activity {
 
     ButtonWidget removeButton = ButtonWidget.i18n("keystrokes.activity.edit.remove.text");
     removeButton.addId("remove-button");
+    removeButton.setPressable(() -> {
+      if (this.selected == null) {
+        return;
+      }
+
+      this.hudWidgetConfig.removeKeyStroke(this.selected);
+      this.manageWidget.checkForNewKeyStrokes();
+      this.manageWidget.setFocused(null);
+    });
     manageButtonContainer.addEntry(removeButton);
 
     this.content.addContent(manageButtonContainer);
@@ -183,6 +195,24 @@ public class HudWidgetEditActivity extends Activity {
     this.overlayWidget.setVisible(false);
     return true;
   }
+
+/*  @Override
+  public boolean mouseScrolled(MutableMouse mouse, double scrollDelta) {
+    if(!this.content.isHovered() || (this.overlayWidget != null && this.overlayWidget.isVisible())) {
+      return super.mouseScrolled(mouse, scrollDelta);
+    }
+
+    double scale = this.scale + (scrollDelta < 0 ? -0.05d : 0.05d);
+    if (scale < 0.5) {
+      scale = 0.5f;
+    } else if (scale > 2.0) {
+      scale = 2.0f;
+    }
+
+    this.scale = (float) scale;
+    this.manageWidget.setScale(this.scale);
+    return super.mouseScrolled(mouse, scrollDelta);
+  } */
 
   @Override
   public boolean shouldHandleEscape() {

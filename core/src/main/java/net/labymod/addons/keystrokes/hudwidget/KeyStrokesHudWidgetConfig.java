@@ -129,6 +129,10 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return true;
   }
 
+  public boolean removeKeyStroke(KeyStrokeConfig keyStrokeConfig) {
+    return this.keyStrokes.get().remove(keyStrokeConfig);
+  }
+
   public void setWidget(KeyStrokesWidget widget) {
     this.widget = widget;
   }
