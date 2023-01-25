@@ -47,8 +47,6 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
   private final Consumer<KeyStrokeConfig> selectConsumer;
 
   private KeyStrokeWidget editing;
-  private float startX;
-  private float startY;
 
   private float offsetX;
   private float offsetY;
@@ -159,10 +157,8 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       return false;
     }
 
-    this.startX = this.editing.bounds().getX();
-    this.offsetX = mouse.getX() - this.startX;
-    this.startY = this.editing.bounds().getY();
-    this.offsetY = mouse.getY() - this.startY;
+    this.offsetX = mouse.getX() - this.editing.bounds().getX();
+    this.offsetY = mouse.getY() - this.editing.bounds().getY();
     this.dragStartTime = System.currentTimeMillis();
     return true;
   }
@@ -180,7 +176,8 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
     }
 
     if (this.updateKeyStrokePosition(this.editing)) {
-      this.hudWidgetConfig.widget().checkForNewKeyStrokes();
+      this.updateSize();
+      this.hudWidgetConfig.widget().updateKeyStrokeBounds();
     }
 
     return true;
@@ -244,11 +241,48 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
             + " y:" + newY);
 
     config.updatePosition(newX, newY);
-    this.updateSize();
     return true;
   }
 
   private boolean updateAnchorPosition(KeyStrokeConfig anchor, float x, float y) {
+    KeyStrokeWidget childWidget = this.findFirstChildIf(child -> child.config() != anchor);
+    if (childWidget == null) {
+      anchor.updatePosition(0, 0);
+      return true;
+    }
+
+    Bounds childBounds = childWidget.bounds();
+    float childX = childBounds.getX();
+    float childY = childBounds.getY();
+
+    float diffX = x - childX + childWidget.config().getX();
+    float diffY = y - childY + childWidget.config().getY();
+
+    float newX = anchor.getX() + diffX;
+    float newY = anchor.getY() + diffY;
+    if (anchor.getX() == newX && anchor.getY() == newY) {
+      return false;
+    }
+
+    System.out.println(
+        "Update anchor from x:" + anchor.getX() + " y:" + anchor.getY() + " to x:" + newX
+            + " y:" + newY);
+
+    anchor.updatePosition(
+        newX,
+        newY
+    );
+
+    for (KeyStrokeConfig keyStroke : this.hudWidgetConfig.getKeyStrokes()) {
+      if (keyStroke == anchor) {
+        continue;
+      }
+
+      keyStroke.updatePosition(
+          keyStroke.getX() - diffX,
+          keyStroke.getY() - diffY
+      );
+    }
 
     return true;
   }

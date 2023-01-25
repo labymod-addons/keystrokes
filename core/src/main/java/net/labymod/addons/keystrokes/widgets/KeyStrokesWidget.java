@@ -83,7 +83,7 @@ public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
     }
 
     KeyStrokeConfig config = anchorWidget.config();
-    //rectangleRenderer.renderOutline(stack, anchorWidget.bounds(), Color.YELLOW.getRGB(), 1);
+    rectangleRenderer.renderOutline(stack, anchorWidget.bounds(), Color.YELLOW.getRGB(), 1);
 
     rectangleRenderer
         .pos(anchorWidget.bounds().getX() - config.getX(),
@@ -100,6 +100,10 @@ public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
     }
 
     this.reload = true;
+    this.updateWidgetBounds(this.bounds());
+  }
+
+  public void updateKeyStrokeBounds() {
     this.updateWidgetBounds(this.bounds());
   }
 
