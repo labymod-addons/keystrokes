@@ -1,39 +1,39 @@
 {
-  "keystrokes" : {
-    "settings" : {
-      "name" : "KeyStrokes",
-      "enabled" : {
-        "name" : "Enabled"
+  "keystrokes": {
+    "settings": {
+      "name": "KeyStrokes",
+      "enabled": {
+        "name": "Enabled"
       }
     },
-    "activity" : {
-      "edit" : {
-        "add" : {
-          "text" : "Add Key",
-          "title" : "Press any key you want to add...",
-          "exit" : "Press ESCAPE to cancel!"
+    "activity": {
+      "edit": {
+        "add": {
+          "text": "Add Key",
+          "title": "Press any key you want to add...",
+          "exit": "Press ESCAPE to cancel!"
         },
-        "remove" : {
-          "text" : "Remove Key"
+        "remove": {
+          "text": "Remove Key"
         }
       }
     },
-    "hudWidget" : {
-      "keyStrokes" : {
-        "name" : "KeyStrokes",
-        "edit" : {
-          "name" : "Edit Layout"
+    "hudWidget": {
+      "keyStrokes": {
+        "name": "KeyStrokes",
+        "edit": {
+          "name": "Edit Layout"
         },
-        "pressedColor" : {
+        "pressedColor": {
           "name": "Color When Pressed"
         },
-        "textColor" : {
+        "textColor": {
           "name": "Text Color"
         },
-        "backgroundColor" : {
+        "backgroundColor": {
           "name": "Background Color"
         },
-        "outline" : {
+        "outline": {
           "name": "Outline"
         }
       }
