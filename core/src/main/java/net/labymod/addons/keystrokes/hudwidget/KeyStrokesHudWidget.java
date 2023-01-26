@@ -18,7 +18,7 @@ package net.labymod.addons.keystrokes.hudwidget;
 
 import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
-import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
+import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
 import net.labymod.api.client.gui.hud.hudwidget.widget.WidgetHudWidget;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.Widget;
@@ -47,27 +47,9 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
   @Override
   public void initialize(AbstractWidget<Widget> widget) {
     super.initialize(widget);
-    System.out.println("initialize");
+    widget.setStencil(false);
     KeyStrokesWidget keyStrokesWidget = new KeyStrokesWidget(this.config);
-    this.config.addWidget(keyStrokesWidget);
     widget.addChild(keyStrokesWidget);
-  }
-
-  @Override
-  public void onBoundsChanged(
-      AbstractWidget<Widget> widget,
-      Rectangle prevRect,
-      Rectangle newRect
-  ) {
-    if (this.config == null) {
-      return;
-    }
-
-    if (prevRect.getWidth() != newRect.getWidth() && prevRect.getHeight() != newRect.getHeight()) {
-      return;
-    }
-
-    this.config.widget(keyStrokesWidget -> keyStrokesWidget.onBoundsChanged(prevRect, newRect));
   }
 
   @Override
@@ -77,7 +59,11 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
 
   @Subscribe
   public void onKey(KeyEvent event) {
-    KeyStrokeConfig keyStroke = this.getConfig().getKeyStroke(event.key());
+    if (this.config == null) {
+      return;
+    }
+
+    KeyStrokeConfig keyStroke = this.config.getKeyStroke(event.key());
     if (keyStroke == null) {
       return;
     }
@@ -87,11 +73,26 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
 
   @Subscribe
   public void onMouseButton(MouseButtonEvent event) {
-    KeyStrokeConfig keyStroke = this.getConfig().getKeyStroke(event.button());
+    if (this.config == null) {
+      return;
+    }
+
+    KeyStrokeConfig keyStroke = this.config.getKeyStroke(event.button());
     if (keyStroke == null) {
       return;
     }
 
     keyStroke.updatePressed(event.action() == Action.CLICK);
+  }
+
+  @Subscribe
+  public void onKeyStrokeUpdate(KeyStrokeUpdateEvent event) {
+    this.requestUpdate();
+  }
+
+  @Override
+  public void onBoundsChanged(AbstractWidget<Widget> widget, Rectangle previousRect,
+      Rectangle newRect) {
+
   }
 }

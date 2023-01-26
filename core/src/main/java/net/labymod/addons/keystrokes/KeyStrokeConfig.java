@@ -16,8 +16,8 @@
 
 package net.labymod.addons.keystrokes;
 
+import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
-import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.render.font.text.TextRenderer;
@@ -32,7 +32,7 @@ public class KeyStrokeConfig {
   private float x;
   private float y;
 
-  private float width = KeyStrokesWidget.HEIGHT;
+  private float width = KeyStrokeGridWidget.DEFAULT_WIDTH;
 
   private transient boolean pressed;
 

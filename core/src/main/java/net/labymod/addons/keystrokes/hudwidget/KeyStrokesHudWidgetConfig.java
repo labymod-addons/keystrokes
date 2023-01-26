@@ -20,10 +20,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
-import net.labymod.addons.keystrokes.activities.HudWidgetEditActivity;
-import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
+import net.labymod.addons.keystrokes.activities.KeyStrokeManageActivity;
 import net.labymod.api.client.gui.hud.hudwidget.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.key.Key;
@@ -69,7 +67,7 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   @MethodOrder(before = "pressedColor")
   @AddonActivitySetting
   public Activity edit() {
-    return new HudWidgetEditActivity(this);
+    return new KeyStrokeManageActivity(this);
   }
 
   public ConfigProperty<Color> pressedColor() {
@@ -86,6 +84,10 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   public ConfigProperty<Boolean> outline() {
     return this.outline;
+  }
+
+  public KeyStrokeConfig anchorConfig() {
+    return this.getKeyStroke(this.base.get());
   }
 
   public KeyStrokeConfig getKeyStroke(Key key) {
@@ -113,16 +115,6 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   public boolean removeKeyStroke(KeyStrokeConfig keyStrokeConfig) {
     return this.keyStrokes.get().remove(keyStrokeConfig);
-  }
-
-  public void addWidget(KeyStrokesWidget widget) {
-    this.widget.add(widget);
-  }
-
-  public void widget(Consumer<KeyStrokesWidget> widget) {
-    for (KeyStrokesWidget keyStrokesWidget : this.widget) {
-      widget.accept(keyStrokesWidget);
-    }
   }
 
   public void setDefaultKeyStrokes() {

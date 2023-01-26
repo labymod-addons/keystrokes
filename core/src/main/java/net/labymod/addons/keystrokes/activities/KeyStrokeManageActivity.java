@@ -16,10 +16,12 @@
 
 package net.labymod.addons.keystrokes.activities;
 
+import java.util.Set;
+import java.util.function.Consumer;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
+import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
-import net.labymod.addons.keystrokes.widgets.KeyStrokeManageWidget;
-import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
+import net.labymod.api.Laby;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.LabyScreen;
 import net.labymod.api.client.gui.screen.Parent;
@@ -35,13 +37,12 @@ import net.labymod.api.client.gui.screen.widget.widgets.input.ButtonWidget;
 import net.labymod.api.client.gui.screen.widget.widgets.layout.FlexibleContentWidget;
 import net.labymod.api.client.gui.screen.widget.widgets.layout.list.HorizontalListWidget;
 import net.labymod.api.client.render.matrix.Stack;
+import net.labymod.api.event.Subscribe;
 import org.jetbrains.annotations.Nullable;
-import java.util.Set;
-import java.util.function.Consumer;
 
 @Link("edit.lss")
 @AutoActivity
-public class HudWidgetEditActivity extends Activity {
+public class KeyStrokeManageActivity extends Activity {
 
   private static final MutableMouse DUMMY_MOUSE = new MutableMouse(-5, -5);
   private final KeyStrokesHudWidgetConfig hudWidgetConfig;
@@ -53,18 +54,12 @@ public class HudWidgetEditActivity extends Activity {
   private DivWidget overlayWidget;
   private KeyStrokeConfig selected;
 
-  public HudWidgetEditActivity(KeyStrokesHudWidgetConfig hudWidgetConfig) {
+  public KeyStrokeManageActivity(KeyStrokesHudWidgetConfig hudWidgetConfig) {
     this.hudWidgetConfig = hudWidgetConfig;
 
-    this.manageWidget = new KeyStrokeManageWidget(this.hudWidgetConfig, selected -> {
-      this.selected = selected;
-      if (selected == null) {
-        System.out.println("Unselect");
-        return;
-      }
-
-      System.out.println("Selected " + selected.key().getName());
-    });
+    this.manageWidget = new KeyStrokeManageWidget(this.hudWidgetConfig,
+        selected -> this.selected = selected
+    );
 
     this.manageWidget.addId("manage");
   }
@@ -72,8 +67,6 @@ public class HudWidgetEditActivity extends Activity {
   @Override
   public void initialize(Parent parent) {
     super.initialize(parent);
-
-    //this.manageWidget.setScale(this.scale);
 
     this.content = new FlexibleContentWidget();
     this.content.addId("content");
@@ -98,9 +91,8 @@ public class HudWidgetEditActivity extends Activity {
       this.overlayWidget.setVisible(true);
       this.addCallback = config -> {
         this.hudWidgetConfig.addKeyStroke(config);
-        this.manageWidget.checkForNewKeyStrokes();
-        this.manageWidget.setFocused(config);
-        this.hudWidgetConfig.widget(KeyStrokesWidget::checkForNewKeyStrokes);
+        this.manageWidget.select(config);
+        Laby.fireEvent(new KeyStrokeUpdateEvent(true));
       };
     });
 
@@ -118,7 +110,7 @@ public class HudWidgetEditActivity extends Activity {
         this.overlayWidget.setVisible(true);
         this.addCallback = config -> {
           if (config == this.selected) {
-            this.manageWidget.setFocused(this.selected);
+            this.manageWidget.select(this.selected);
             return;
           }
 
@@ -130,9 +122,8 @@ public class HudWidgetEditActivity extends Activity {
 
           this.hudWidgetConfig.removeKeyStroke(this.selected);
           this.hudWidgetConfig.addKeyStroke(config);
-          this.hudWidgetConfig.widget(KeyStrokesWidget::reInitialize);
-          this.manageWidget.reload();
-          this.manageWidget.setFocused(config);
+          Laby.fireEvent(new KeyStrokeUpdateEvent(true));
+          this.manageWidget.select(config);
         };
         return;
       }
@@ -189,9 +180,8 @@ public class HudWidgetEditActivity extends Activity {
 
       this.hudWidgetConfig.removeKeyStroke(this.selected);
       this.manageWidget.updateSize();
-      this.manageWidget.checkForNewKeyStrokes();
-      this.hudWidgetConfig.widget(KeyStrokesWidget::checkForNewKeyStrokes);
-      this.manageWidget.setFocused(null);
+      Laby.fireEvent(new KeyStrokeUpdateEvent(true));
+      this.manageWidget.select(null);
     });
     manageButtonContainer.addEntry(removeButton);
 
@@ -234,7 +224,7 @@ public class HudWidgetEditActivity extends Activity {
   @Override
   public void onCloseScreen() {
     super.onCloseScreen();
-    this.hudWidgetConfig.widget(KeyStrokesWidget::checkForNewKeyStrokes);
+    Laby.fireEvent(new KeyStrokeUpdateEvent(false));
   }
 
   @Override
@@ -254,7 +244,6 @@ public class HudWidgetEditActivity extends Activity {
     KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(mouseButton, x, y);
     this.addCallback.accept(keyStrokeConfig);
 
-    System.out.println("Added key " + mouseButton.getName());
     this.overlayWidget.setVisible(false);
     return true;
   }
@@ -289,6 +278,13 @@ public class HudWidgetEditActivity extends Activity {
 
   @Override
   public <T extends LabyScreen> @Nullable T renew() {
-    return new HudWidgetEditActivity(this.hudWidgetConfig).generic();
+    return new KeyStrokeManageActivity(this.hudWidgetConfig).generic();
+  }
+
+  @Subscribe
+  public void onKeyStrokeUpdate(KeyStrokeUpdateEvent event) {
+    if (event.isRelevantForEditing() && this.manageWidget != null) {
+      this.manageWidget.reload();
+    }
   }
 }

@@ -14,16 +14,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package net.labymod.addons.keystrokes.widgets;
+package net.labymod.addons.keystrokes.activities;
 
 import java.awt.*;
 import java.util.function.Consumer;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
+import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
-import net.labymod.api.client.gui.icon.Icon;
-import net.labymod.api.client.gui.lss.property.LssProperty;
+import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
+import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
+import net.labymod.api.Laby;
 import net.labymod.api.client.gui.lss.property.annotation.AutoWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
+import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.MouseButton;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
@@ -31,69 +34,57 @@ import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.matrix.Stack;
-import net.labymod.api.util.bounds.ModifyReason;
 import net.labymod.api.util.bounds.Point;
 import net.labymod.api.util.bounds.Rectangle;
 
 @AutoWidget
-public class KeyStrokeManageWidget extends KeyStrokesWidget {
+public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
 
-  private static final ModifyReason REASON = ModifyReason.of("keyStrokeUpdate");
-
+  private static final RectangleRenderer RECTANGLE_RENDERER = Laby.labyAPI().renderPipeline()
+      .rectangleRenderer();
   private static final Key CLICK_KEY = MouseButton.LEFT;
+
   private static final long DRAGGING_DELAY = 100L;
 
-  private final LssProperty<Icon> anchorIcon = new LssProperty<>(null);
   private final Consumer<KeyStrokeConfig> selectConsumer;
 
-  private KeyStrokeWidget editing;
-
+  private KeyStrokeWidget selected;
+  private long draggingStartTime;
   private float offsetX;
   private float offsetY;
-  private long dragStartTime;
 
-  public KeyStrokeManageWidget(KeyStrokesHudWidgetConfig config,
-      Consumer<KeyStrokeConfig> selectConsumer) {
+  protected KeyStrokeManageWidget(
+      KeyStrokesHudWidgetConfig config,
+      Consumer<KeyStrokeConfig> selectConsumer
+  ) {
     super(config);
+
     this.selectConsumer = selectConsumer;
   }
 
   @Override
-  public void tick() {
-    super.tick();
-    this.checkForNewKeyStrokes();
-  }
-
-  @Override
-  protected void updateWidgetBounds(Rectangle bounds) {
-    this.updateWidgetBounds(
-        Point.fixed(
-            (int) bounds.getCenterX(),
-            (int) bounds.getCenterY()
-        ),
-        false,
-        true
-    );
+  public void initialize(Parent parent) {
+    super.initialize(parent);
+    this.updateWidgetBounds(this.bounds());
   }
 
   @Override
   public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
-    if (this.editing == null) {
+    if (this.selected == null) {
       super.renderWidget(stack, mouse, partialTicks);
       return;
     }
 
-    if (this.dragStartTime == -1
-        || this.dragStartTime + DRAGGING_DELAY > System.currentTimeMillis()) {
+    if (this.draggingStartTime == -1
+        || this.draggingStartTime + DRAGGING_DELAY > System.currentTimeMillis()) {
       super.renderWidget(stack, mouse, partialTicks);
-      this.highlightEditing(stack);
+      this.highlightSelected(stack);
       return;
     }
 
-    System.out.println("DRAGGING " + this.offsetX + " | " + this.offsetY);
     super.renderDebug(stack);
     for (Widget child : this.children) {
-      if (child == this.editing) {
+      if (child == this.selected) {
         continue;
       }
 
@@ -101,7 +92,7 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
     }
 
     Bounds parentBounds = this.bounds();
-    Bounds bounds = this.editing.bounds();
+    Bounds bounds = this.selected.bounds();
     float x = mouse.getX() - this.offsetX;
     if (x < parentBounds.getX()) {
       x = parentBounds.getX();
@@ -118,25 +109,8 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
     bounds.setOuterPosition(x, y, REASON);
 
-    this.editing.render(stack, mouse, partialTicks);
-    this.highlightEditing(stack);
-  }
-
-  private void highlightEditing(Stack stack) {
-    Bounds parentBounds = this.bounds();
-    Bounds bounds = this.editing.bounds();
-    RectangleRenderer rectangleRenderer = this.labyAPI.renderPipeline().rectangleRenderer();
-    rectangleRenderer.pos(parentBounds.getX(), bounds.getCenterY() - 0.5F, bounds.getX(),
-        bounds.getCenterY() + 0.5F).color(Color.GRAY.getRGB()).render(stack);
-
-    rectangleRenderer.pos(bounds.getCenterX() - 0.5F, parentBounds.getY(),
-        bounds.getCenterX() + 0.5F, bounds.getY()).color(Color.GRAY.getRGB()).render(stack);
-
-    rectangleRenderer.pos(bounds.getMaxX(), bounds.getCenterY() - 0.5F, parentBounds.getMaxX(),
-        bounds.getCenterY() + 0.5F).color(Color.GRAY.getRGB()).render(stack);
-
-    rectangleRenderer.pos(bounds.getCenterX() - 0.5F, parentBounds.getMaxY(),
-        bounds.getCenterX() + 0.5F, bounds.getMaxY()).color(Color.GRAY.getRGB()).render(stack);
+    this.selected.render(stack, mouse, partialTicks);
+    this.highlightSelected(stack);
   }
 
   @Override
@@ -146,68 +120,109 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
     }
 
     KeyStrokeWidget clicked = this.findFirstChildIf(AbstractWidget::isHovered);
-    if (this.editing == null && clicked == null) {
+    if (this.selected == null && clicked == null) {
       return false;
     }
 
-    this.editing = clicked;
+    this.selected = clicked;
     this.selectConsumer.accept(clicked == null ? null : clicked.config());
 
     if (clicked == null) {
       return false;
     }
 
-    this.offsetX = mouse.getX() - this.editing.bounds().getX();
-    this.offsetY = mouse.getY() - this.editing.bounds().getY();
-    this.dragStartTime = System.currentTimeMillis();
+    this.offsetX = mouse.getX() - this.selected.bounds().getX();
+    this.offsetY = mouse.getY() - this.selected.bounds().getY();
+    this.draggingStartTime = System.currentTimeMillis();
     return true;
   }
 
   @Override
   public boolean mouseReleased(MutableMouse mouse, MouseButton mouseButton) {
-    if (this.editing == null || this.dragStartTime == -1) {
+    if (this.selected == null || this.draggingStartTime == -1) {
       return false;
     }
 
-    long dragStartTime = this.dragStartTime;
-    this.dragStartTime = -1;
+    long dragStartTime = this.draggingStartTime;
+    this.draggingStartTime = -1;
     if (System.currentTimeMillis() < dragStartTime + DRAGGING_DELAY) {
       return true;
     }
 
-    if (this.updateKeyStrokePosition(this.editing)) {
+    if (this.updateKeyStrokePosition(this.selected)) {
       this.updateSize();
-      this.hudWidgetConfig.widget(KeyStrokesWidget::updateKeyStrokeBounds);
+      Laby.fireEvent(new KeyStrokeUpdateEvent(false));
     }
 
     return true;
-  }
-
-  public LssProperty<Icon> anchorIcon() {
-    return this.anchorIcon;
   }
 
   @Override
-  protected boolean isEditing() {
-    return true;
+  public void onBoundsChanged(Rectangle previousRect, Rectangle newRect) {
+    this.updateWidgetBounds(newRect);
   }
 
-  public void setFocused(KeyStrokeConfig keyStrokeConfig) {
-    if (keyStrokeConfig == null) {
-      this.editing = null;
-      return;
-    }
-
-    KeyStrokeWidget keyStrokeWidget = this.findFirstChildIf(
-        child -> child.config() == keyStrokeConfig
+  @Override
+  protected void updateWidgetBounds(Rectangle bounds) {
+    this.updateWidgetBounds(
+        Point.fixed(
+            (int) bounds.getCenterX(),
+            (int) bounds.getCenterY()
+        ),
+        false,
+        true
     );
-
-    if (keyStrokeWidget != null) {
-      this.editing = keyStrokeWidget;
-      this.dragStartTime = -1;
-    }
   }
 
+  @Override
+  public void reload() {
+    super.reload();
+    this.updateWidgetBounds(this.bounds());
+  }
+
+  private void highlightSelected(Stack stack) {
+    Bounds parentBounds = this.bounds();
+    Bounds bounds = this.selected.bounds();
+    RECTANGLE_RENDERER
+        .pos(
+            parentBounds.getX(),
+            bounds.getCenterY() - 0.5F,
+            bounds.getX(),
+            bounds.getCenterY() + 0.5F
+        )
+        .color(Color.GRAY.getRGB())
+        .render(stack);
+
+    RECTANGLE_RENDERER
+        .pos(
+            bounds.getCenterX() - 0.5F,
+            parentBounds.getY(),
+            bounds.getCenterX() + 0.5F,
+            bounds.getY()
+        )
+        .color(Color.GRAY.getRGB())
+        .render(stack);
+
+    RECTANGLE_RENDERER
+        .pos(
+            bounds.getMaxX(),
+            bounds.getCenterY() - 0.5F,
+            parentBounds.getMaxX(),
+            bounds.getCenterY() + 0.5F
+        )
+        .color(Color.GRAY.getRGB())
+        .render(stack);
+
+    RECTANGLE_RENDERER
+        .pos(
+            bounds.getCenterX() - 0.5F,
+            parentBounds.getMaxY(),
+            bounds.getCenterX() + 0.5F,
+            bounds.getMaxY()
+        )
+        .color(Color.GRAY.getRGB())
+        .render(stack);
+  }
 
   private boolean updateKeyStrokePosition(KeyStrokeWidget widget) {
     Bounds keyStrokeBounds = widget.bounds();
@@ -216,12 +231,12 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
     KeyStrokeConfig config = widget.config();
     Key key = config.key();
-    Key anchorKey = this.hudWidgetConfig.base().get();
+    Key anchorKey = this.config.base().get();
     if (key == anchorKey) {
       return this.updateAnchorPosition(config, x, y);
     }
 
-    KeyStrokeConfig anchorConfig = this.hudWidgetConfig.getKeyStroke(anchorKey);
+    KeyStrokeConfig anchorConfig = this.config.getKeyStroke(anchorKey);
     Widget anchor = this.findFirstChildIf(child -> child.config() == anchorConfig);
     if (anchor == null) {
       return false;
@@ -266,7 +281,7 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
         newY
     );
 
-    for (KeyStrokeConfig keyStroke : this.hudWidgetConfig.getKeyStrokes()) {
+    for (KeyStrokeConfig keyStroke : this.config.getKeyStrokes()) {
       if (keyStroke == anchor) {
         continue;
       }
@@ -287,8 +302,8 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
     float maxY = 0;
 
     KeyStrokeConfig anchorConfig = null;
-    Key key = this.hudWidgetConfig.base().get();
-    for (KeyStrokeConfig keyStrokeConfig : this.hudWidgetConfig.getKeyStrokes()) {
+    Key key = this.config.base().get();
+    for (KeyStrokeConfig keyStrokeConfig : this.config.getKeyStrokes()) {
       if (keyStrokeConfig.key() == key) {
         anchorConfig = keyStrokeConfig;
         continue;
@@ -321,13 +336,19 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
     );
   }
 
-  public void reload() {
-    this.reload = true;
-    this.updateWidgetBounds(this.bounds());
-  }
+  public void select(KeyStrokeConfig keyStrokeConfig) {
+    if (keyStrokeConfig == null) {
+      this.selected = null;
+      return;
+    }
 
-  @Override
-  public void onBoundsChanged(Rectangle previousRect, Rectangle bounds) {
-    this.updateWidgetBounds(bounds);
+    KeyStrokeWidget keyStrokeWidget = this.findFirstChildIf(
+        child -> child.config() == keyStrokeConfig
+    );
+
+    if (keyStrokeWidget != null) {
+      this.selected = keyStrokeWidget;
+      this.draggingStartTime = -1;
+    }
   }
 }
