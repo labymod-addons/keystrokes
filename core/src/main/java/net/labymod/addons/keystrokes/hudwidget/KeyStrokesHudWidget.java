@@ -16,8 +16,8 @@
 
 package net.labymod.addons.keystrokes.hudwidget;
 
+import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
-import net.labymod.addons.keystrokes.KeyStrokes;
 import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
 import net.labymod.api.client.gui.hud.hudwidget.widget.WidgetHudWidget;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
@@ -31,26 +31,43 @@ import net.labymod.api.util.bounds.Rectangle;
 
 public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConfig> {
 
-  private final KeyStrokes keyStrokes;
-  private KeyStrokesWidget keyStrokesWidget;
-
-  public KeyStrokesHudWidget(KeyStrokes keyStrokes) {
+  public KeyStrokesHudWidget() {
     super("keyStrokes", KeyStrokesHudWidgetConfig.class);
-    this.keyStrokes = keyStrokes;
+  }
+
+  @Override
+  public void load(KeyStrokesHudWidgetConfig config) {
+    super.load(config);
+    Set<KeyStrokeConfig> keyStrokes = config.getKeyStrokes();
+    if (keyStrokes == null || keyStrokes.isEmpty()) {
+      config.setDefaultKeyStrokes();
+    }
   }
 
   @Override
   public void initialize(AbstractWidget<Widget> widget) {
     super.initialize(widget);
-    this.keyStrokesWidget = new KeyStrokesWidget(this.config);
-    this.config.setWidget(this.keyStrokesWidget);
-    widget.addChild(this.keyStrokesWidget);
+    System.out.println("initialize");
+    KeyStrokesWidget keyStrokesWidget = new KeyStrokesWidget(this.config);
+    this.config.addWidget(keyStrokesWidget);
+    widget.addChild(keyStrokesWidget);
   }
 
   @Override
-  public void onBoundsChanged(AbstractWidget<Widget> widget, Rectangle newRect) {
-    this.keyStrokesWidget.reInitialize();
-    super.onBoundsChanged(widget, newRect);
+  public void onBoundsChanged(
+      AbstractWidget<Widget> widget,
+      Rectangle prevRect,
+      Rectangle newRect
+  ) {
+    if (this.config == null) {
+      return;
+    }
+
+    if (prevRect.getWidth() != newRect.getWidth() && prevRect.getHeight() != newRect.getHeight()) {
+      return;
+    }
+
+    this.config.widget(keyStrokesWidget -> keyStrokesWidget.onBoundsChanged(prevRect, newRect));
   }
 
   @Override

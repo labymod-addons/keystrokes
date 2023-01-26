@@ -19,6 +19,7 @@ package net.labymod.addons.keystrokes.activities;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeManageWidget;
+import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.LabyScreen;
 import net.labymod.api.client.gui.screen.Parent;
@@ -35,6 +36,8 @@ import net.labymod.api.client.gui.screen.widget.widgets.layout.FlexibleContentWi
 import net.labymod.api.client.gui.screen.widget.widgets.layout.list.HorizontalListWidget;
 import net.labymod.api.client.render.matrix.Stack;
 import org.jetbrains.annotations.Nullable;
+import java.util.Set;
+import java.util.function.Consumer;
 
 @Link("edit.lss")
 @AutoActivity
@@ -42,11 +45,13 @@ public class HudWidgetEditActivity extends Activity {
 
   private static final MutableMouse DUMMY_MOUSE = new MutableMouse(-5, -5);
   private final KeyStrokesHudWidgetConfig hudWidgetConfig;
-  private FlexibleContentWidget content;
   private final KeyStrokeManageWidget manageWidget;
+
+  private Consumer<KeyStrokeConfig> addCallback;
+
+  private FlexibleContentWidget content;
   private DivWidget overlayWidget;
   private KeyStrokeConfig selected;
-  //private float scale = 1;
 
   public HudWidgetEditActivity(KeyStrokesHudWidgetConfig hudWidgetConfig) {
     this.hudWidgetConfig = hudWidgetConfig;
@@ -89,7 +94,15 @@ public class HudWidgetEditActivity extends Activity {
 
     ButtonWidget addButton = ButtonWidget.i18n("keystrokes.activity.edit.add.text");
     addButton.addId("add-button");
-    addButton.setPressable(() -> this.overlayWidget.setVisible(true));
+    addButton.setPressable(() -> {
+      this.overlayWidget.setVisible(true);
+      this.addCallback = config -> {
+        this.hudWidgetConfig.addKeyStroke(config);
+        this.manageWidget.checkForNewKeyStrokes();
+        this.manageWidget.setFocused(config);
+        this.hudWidgetConfig.widget(KeyStrokesWidget::checkForNewKeyStrokes);
+      };
+    });
 
     manageButtonContainer.addEntry(addButton);
 
@@ -100,8 +113,84 @@ public class HudWidgetEditActivity extends Activity {
         return;
       }
 
+      Set<KeyStrokeConfig> keyStrokes = this.hudWidgetConfig.getKeyStrokes();
+      if (keyStrokes.size() == 1) {
+        this.overlayWidget.setVisible(true);
+        this.addCallback = config -> {
+          if (config == this.selected) {
+            this.manageWidget.setFocused(this.selected);
+            return;
+          }
+
+          this.hudWidgetConfig.base().set(config.key());
+          config.updatePosition(
+              this.selected.getX(),
+              this.selected.getY()
+          );
+
+          this.hudWidgetConfig.removeKeyStroke(this.selected);
+          this.hudWidgetConfig.addKeyStroke(config);
+          this.hudWidgetConfig.widget(KeyStrokesWidget::reInitialize);
+          this.manageWidget.reload();
+          this.manageWidget.setFocused(config);
+        };
+        return;
+      }
+
+      if (this.selected.key() == this.hudWidgetConfig.base().get()) {
+        KeyStrokeConfig config = null;
+        for (KeyStrokeConfig keyStroke : this.hudWidgetConfig.getKeyStrokes()) {
+          if (keyStroke != this.selected) {
+            config = keyStroke;
+            break;
+          }
+        }
+
+        if (config == null) {
+          return;
+        }
+
+        this.hudWidgetConfig.removeKeyStroke(this.selected);
+
+        float anchorX = config.getX();
+        float anchorY = config.getY();
+        for (KeyStrokeConfig keyStroke : this.hudWidgetConfig.getKeyStrokes()) {
+          if (keyStroke == config) {
+            continue;
+          }
+
+          float x = keyStroke.getX();
+          float y = keyStroke.getY();
+          if (x == anchorX) {
+            x = 0;
+          } else {
+            x = x - anchorX;
+          }
+
+          if (y == anchorY) {
+            y = 0;
+          } else {
+            y = y - anchorY;
+          }
+
+          keyStroke.updatePosition(
+              x,
+              y
+          );
+        }
+
+        config.updatePosition(
+            anchorX + this.selected.getX(),
+            anchorY + this.selected.getY()
+        );
+
+        this.hudWidgetConfig.base().set(config.key());
+      }
+
       this.hudWidgetConfig.removeKeyStroke(this.selected);
+      this.manageWidget.updateSize();
       this.manageWidget.checkForNewKeyStrokes();
+      this.hudWidgetConfig.widget(KeyStrokesWidget::checkForNewKeyStrokes);
       this.manageWidget.setFocused(null);
     });
     manageButtonContainer.addEntry(removeButton);
@@ -145,12 +234,12 @@ public class HudWidgetEditActivity extends Activity {
   @Override
   public void onCloseScreen() {
     super.onCloseScreen();
-    this.hudWidgetConfig.widget().checkForNewKeyStrokes();
+    this.hudWidgetConfig.widget(KeyStrokesWidget::checkForNewKeyStrokes);
   }
 
   @Override
   public boolean mouseClicked(MutableMouse mouse, MouseButton mouseButton) {
-    if (this.overlayWidget == null || !this.overlayWidget.isVisible()) {
+    if (this.overlayWidget == null || !this.overlayWidget.isVisible() || this.addCallback == null) {
       return super.mouseClicked(mouse, mouseButton);
     }
 
@@ -162,10 +251,9 @@ public class HudWidgetEditActivity extends Activity {
       y = this.manageWidget.getMaxY() + 2;
     }
 
-    KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(mouseButton, this.hudWidgetConfig, x, y);
-    this.hudWidgetConfig.addKeyStroke(keyStrokeConfig);
-    this.manageWidget.checkForNewKeyStrokes();
-    this.manageWidget.setFocused(keyStrokeConfig);
+    KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(mouseButton, x, y);
+    this.addCallback.accept(keyStrokeConfig);
+
     System.out.println("Added key " + mouseButton.getName());
     this.overlayWidget.setVisible(false);
     return true;
@@ -173,7 +261,7 @@ public class HudWidgetEditActivity extends Activity {
 
   @Override
   public boolean keyPressed(Key key, InputType type) {
-    if (this.overlayWidget == null || !this.overlayWidget.isVisible()) {
+    if (this.overlayWidget == null || !this.overlayWidget.isVisible() || this.addCallback == null) {
       return super.keyPressed(key, type);
     }
 
@@ -186,10 +274,8 @@ public class HudWidgetEditActivity extends Activity {
         y = this.manageWidget.getMaxY() + 2;
       }
 
-      KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(key, this.hudWidgetConfig, x, y);
-      this.hudWidgetConfig.addKeyStroke(keyStrokeConfig);
-      this.manageWidget.checkForNewKeyStrokes();
-      this.manageWidget.setFocused(keyStrokeConfig);
+      KeyStrokeConfig keyStrokeConfig = new KeyStrokeConfig(key, x, y);
+      this.addCallback.accept(keyStrokeConfig);
     }
 
     this.overlayWidget.setVisible(false);

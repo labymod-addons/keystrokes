@@ -38,7 +38,7 @@ public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
   public static final float HEIGHT = 20;
 
   protected final KeyStrokesHudWidgetConfig hudWidgetConfig;
-  private boolean reload;
+  protected boolean reload;
 
   protected float x;
   protected float y;
@@ -68,6 +68,10 @@ public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
   }
 
   protected void renderDebug(Stack stack) {
+    if (true) {
+      return;
+    }
+
     Bounds bounds = this.bounds();
     RectangleRenderer rectangleRenderer = this.labyAPI.renderPipeline().rectangleRenderer();
     rectangleRenderer.renderOutline(stack, bounds, Color.RED.getRGB(), 1);
@@ -101,10 +105,16 @@ public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
 
     this.reload = true;
     this.updateWidgetBounds(this.bounds());
+    if (!this.isEditing()) {
+      this.reInitialize();
+    }
   }
 
   public void updateKeyStrokeBounds() {
     this.updateWidgetBounds(this.bounds());
+    if (!this.isEditing()) {
+      this.reInitialize();
+    }
   }
 
   protected void updateWidgetBounds(Rectangle bounds) {
@@ -178,7 +188,6 @@ public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
       } else {
         keyStrokeWidget = this.findFirstChildIf(child -> child.config() == keyStroke);
         if (keyStrokeWidget == null) {
-          System.out.println("could not find widget for key " + keyStroke.key());
           break;
         }
       }
@@ -216,12 +225,13 @@ public class KeyStrokesWidget extends AbstractWidget<KeyStrokeWidget> {
 
   @Override
   public void onBoundsChanged(Rectangle previousRect, Rectangle bounds) {
-    super.onBoundsChanged(previousRect, bounds);
-
-    try {
-      this.updateWidgetBounds(bounds);
-    } catch (StackOverflowError ignored) {
-      ignored.printStackTrace();
+    for (KeyStrokeWidget child : this.children) {
+      Bounds childBounds = child.bounds();
+      childBounds.setPosition(
+          childBounds.getX() + bounds.getX() - previousRect.getX(),
+          childBounds.getY() + bounds.getY() - previousRect.getY(),
+          REASON
+      );
     }
   }
 

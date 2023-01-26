@@ -16,8 +16,11 @@
 
 package net.labymod.addons.keystrokes.hudwidget;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.activities.HudWidgetEditActivity;
 import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
@@ -53,17 +56,11 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
 
   private final ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(
-      new HashSet<>(),
-      set -> {
-        set.add(new KeyStrokeConfig(Key.W, this, 0, -22));
-        set.add(new KeyStrokeConfig(Key.A, this, -22, 0));
-        set.add(new KeyStrokeConfig(Key.S, this, 22, 22));
-        set.add(new KeyStrokeConfig(Key.D, this, 22, 0));
-      });
+      new HashSet<>());
 
   private final ConfigProperty<Key> base = new ConfigProperty<>(Key.S);
 
-  private transient KeyStrokesWidget widget;
+  private transient List<KeyStrokesWidget> widget = new ArrayList<>();
 
   public Set<KeyStrokeConfig> getKeyStrokes() {
     return this.keyStrokes.get();
@@ -118,11 +115,22 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return this.keyStrokes.get().remove(keyStrokeConfig);
   }
 
-  public void setWidget(KeyStrokesWidget widget) {
-    this.widget = widget;
+  public void addWidget(KeyStrokesWidget widget) {
+    this.widget.add(widget);
   }
 
-  public KeyStrokesWidget widget() {
-    return this.widget;
+  public void widget(Consumer<KeyStrokesWidget> widget) {
+    for (KeyStrokesWidget keyStrokesWidget : this.widget) {
+      widget.accept(keyStrokesWidget);
+    }
+  }
+
+  public void setDefaultKeyStrokes() {
+    Set<KeyStrokeConfig> keyStrokes = new HashSet<>();
+    keyStrokes.add(new KeyStrokeConfig(Key.W, 0, -22));
+    keyStrokes.add(new KeyStrokeConfig(Key.A, -22, 0));
+    keyStrokes.add(new KeyStrokeConfig(Key.S, 22, 22));
+    keyStrokes.add(new KeyStrokeConfig(Key.D, 22, 0));
+    this.keyStrokes.set(keyStrokes);
   }
 }

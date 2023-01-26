@@ -16,7 +16,6 @@
 
 package net.labymod.addons.keystrokes;
 
-import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.addons.keystrokes.widgets.KeyStrokesWidget;
 import net.labymod.api.Laby;
@@ -37,13 +36,12 @@ public class KeyStrokeConfig {
 
   private transient boolean pressed;
 
-  public KeyStrokeConfig(Key key, KeyStrokesHudWidgetConfig config, float x, float y) {
+  public KeyStrokeConfig(Key key, float x, float y) {
     this.key = key;
     this.updateWidth(key);
 
     this.x = x;
     this.y = y;
-
   }
 
   public void updatePressed(boolean pressed) {

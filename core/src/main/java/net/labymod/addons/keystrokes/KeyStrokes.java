@@ -27,7 +27,7 @@ public class KeyStrokes extends LabyAddon<KeyStrokesConfiguration> {
   protected void enable() {
     this.registerSettingCategory();
 
-    this.labyAPI().hudWidgetRegistry().register(new KeyStrokesHudWidget(this));
+    this.labyAPI().hudWidgetRegistry().register(new KeyStrokesHudWidget());
   }
 
   @Override

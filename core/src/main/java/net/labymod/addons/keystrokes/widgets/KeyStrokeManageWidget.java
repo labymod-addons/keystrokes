@@ -177,7 +177,7 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
     if (this.updateKeyStrokePosition(this.editing)) {
       this.updateSize();
-      this.hudWidgetConfig.widget().updateKeyStrokeBounds();
+      this.hudWidgetConfig.widget(KeyStrokesWidget::updateKeyStrokeBounds);
     }
 
     return true;
@@ -208,18 +208,20 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
     }
   }
 
+
   private boolean updateKeyStrokePosition(KeyStrokeWidget widget) {
     Bounds keyStrokeBounds = widget.bounds();
     float x = keyStrokeBounds.getX();
     float y = keyStrokeBounds.getY();
 
-    Key key = widget.key();
+    KeyStrokeConfig config = widget.config();
+    Key key = config.key();
     Key anchorKey = this.hudWidgetConfig.base().get();
-    KeyStrokeConfig anchorConfig = this.hudWidgetConfig.getKeyStroke(anchorKey);
     if (key == anchorKey) {
-      return this.updateAnchorPosition(anchorConfig, x, y);
+      return this.updateAnchorPosition(config, x, y);
     }
 
+    KeyStrokeConfig anchorConfig = this.hudWidgetConfig.getKeyStroke(anchorKey);
     Widget anchor = this.findFirstChildIf(child -> child.config() == anchorConfig);
     if (anchor == null) {
       return false;
@@ -231,14 +233,9 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
 
     float newX = x - anchorX;
     float newY = y - anchorY;
-    KeyStrokeConfig config = widget.config();
     if (config.getX() == newX && config.getY() == newY) {
       return false;
     }
-
-    System.out.println(
-        "Update " + key + " from x:" + config.getX() + " y:" + config.getY() + " to x:" + newX
-            + " y:" + newY);
 
     config.updatePosition(newX, newY);
     return true;
@@ -264,10 +261,6 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
       return false;
     }
 
-    System.out.println(
-        "Update anchor from x:" + anchor.getX() + " y:" + anchor.getY() + " to x:" + newX
-            + " y:" + newY);
-
     anchor.updatePosition(
         newX,
         newY
@@ -287,7 +280,7 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
     return true;
   }
 
-  private void updateSize() {
+  public void updateSize() {
     float minX = 0;
     float minY = 0;
     float maxX = 0;
@@ -326,5 +319,15 @@ public class KeyStrokeManageWidget extends KeyStrokesWidget {
         -minX,
         -minY
     );
+  }
+
+  public void reload() {
+    this.reload = true;
+    this.updateWidgetBounds(this.bounds());
+  }
+
+  @Override
+  public void onBoundsChanged(Rectangle previousRect, Rectangle bounds) {
+    this.updateWidgetBounds(bounds);
   }
 }
