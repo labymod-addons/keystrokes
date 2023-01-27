@@ -19,10 +19,13 @@ package net.labymod.addons.keystrokes.hudwidget;
 import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
+import net.labymod.api.Laby;
 import net.labymod.api.client.gui.hud.hudwidget.widget.WidgetHudWidget;
+import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.event.Subscribe;
+import net.labymod.api.event.client.gui.screen.ScreenOpenEvent;
 import net.labymod.api.event.client.input.KeyEvent;
 import net.labymod.api.event.client.input.KeyEvent.State;
 import net.labymod.api.event.client.input.MouseButtonEvent;
@@ -58,34 +61,44 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
 
   @Subscribe
   public void onKey(KeyEvent event) {
-    if (this.config == null) {
-      return;
-    }
-
-    KeyStrokeConfig keyStroke = this.config.getKeyStroke(event.key());
-    if (keyStroke == null) {
-      return;
-    }
-
-    keyStroke.updatePressed(event.state() != State.UNPRESSED);
+    this.press(event.key(), event.state() != State.UNPRESSED);
   }
 
   @Subscribe
   public void onMouseButton(MouseButtonEvent event) {
-    if (this.config == null) {
-      return;
-    }
-
-    KeyStrokeConfig keyStroke = this.config.getKeyStroke(event.button());
-    if (keyStroke == null) {
-      return;
-    }
-
-    keyStroke.updatePressed(event.action() == Action.CLICK);
+    this.press(event.button(), event.action() == Action.CLICK);
   }
 
   @Subscribe
   public void onKeyStrokeUpdate(KeyStrokeUpdateEvent event) {
     this.requestUpdate();
+  }
+
+  @Subscribe
+  public void onScreenOpen(ScreenOpenEvent event) {
+    if (event.getPreviousScreen() != null) {
+      return;
+    }
+
+    for (KeyStrokeConfig keyStroke : this.config.getKeyStrokes()) {
+      keyStroke.updatePressed(false);
+    }
+  }
+
+  private void press(Key key, boolean pressed) {
+    if (this.config == null) {
+      return;
+    }
+
+    if (pressed && !Laby.labyAPI().minecraft().isMouseLocked()) {
+      return;
+    }
+
+    KeyStrokeConfig keyStroke = this.config.getKeyStroke(key);
+    if (keyStroke == null) {
+      return;
+    }
+
+    keyStroke.updatePressed(pressed);
   }
 }
