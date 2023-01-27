@@ -1,0 +1,34 @@
+@import
+
+super
+(
+)
+;
+
+.content {
+  use-floating-point-position: false;
+
+  .manage-container {
+    border: none;
+
+    border-color: gray;
+    border-thickness: 1.5;
+    border-radius: 6;
+
+    .overlay {
+      padding: 1;
+      border-radius: 5;
+    }
+  }
+
+  .manage-button-container {
+    space-between-entries: 2;
+
+    .button {
+      padding-left: 10;
+      padding-right: 10;
+      filter: blur(0);
+      height: 16;
+    }
+  }
+}
