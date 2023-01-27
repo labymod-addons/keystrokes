@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.activities.KeyStrokeManageActivity;
+import net.labymod.api.Laby;
 import net.labymod.api.client.gui.hud.hudwidget.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.key.Key;
@@ -37,7 +38,7 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   @ColorPickerSetting(chroma = true, alpha = true)
   private final ConfigProperty<Color> pressedColor = new ConfigProperty<>(
-      Color.ofRGB(255, 255, 255, 150)
+      Color.ofRGB(255, 255, 255, 104)
   );
 
   @ColorPickerSetting(chroma = true, alpha = true)
@@ -54,7 +55,12 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
 
   @SwitchSetting
-  private final ConfigProperty<Boolean> roundedCorners = new ConfigProperty<>(false);
+  private final ConfigProperty<Boolean> roundedCorners = new ConfigProperty<>(
+      Laby.labyAPI().themeService().currentTheme().getId().equals("fancy")
+  );
+
+  @SwitchSetting
+  private final ConfigProperty<Boolean> transition = new ConfigProperty<>(true);
 
   private final ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(
       new HashSet<>());
@@ -91,6 +97,10 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   public ConfigProperty<Boolean> roundedCorners() {
     return this.roundedCorners;
+  }
+
+  public ConfigProperty<Boolean> transition() {
+    return this.transition;
   }
 
   public KeyStrokeConfig anchorConfig() {

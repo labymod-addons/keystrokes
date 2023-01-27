@@ -28,6 +28,8 @@ import net.labymod.api.client.render.RenderPipeline;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.font.text.TextRenderer;
 import net.labymod.api.client.render.matrix.Stack;
+import net.labymod.api.util.Color;
+import net.labymod.api.util.ColorUtil;
 
 public class KeyStrokeWidget extends SimpleWidget {
 
@@ -50,29 +52,65 @@ public class KeyStrokeWidget extends SimpleWidget {
   public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
     super.renderWidget(stack, mouse, partialTicks);
 
-    int textColor = this.getTextColor();
-
     Bounds bounds = this.bounds();
+    boolean transition = this.defaultConfig.transition().get();
+    float transitionProgress = !transition ? 1.0F : this.getTransitionProgress();
+    boolean renderPressedSeparate = transitionProgress != 1.0F && transitionProgress != 0.0F;
+
+    int backgroundColor;
+    if (renderPressedSeparate) {
+      backgroundColor = this.defaultConfig.backgroundColor().get().get();
+    } else {
+      backgroundColor = this.keyStroke.isPressed() ? this.defaultConfig.pressedColor().get().get()
+          : this.defaultConfig.backgroundColor().get().get();
+    }
+
     RECTANGLE_RENDERER
         .pos(bounds.rectangle(BoundsType.OUTER))
-        .color(this.getBackgroundColor());
+        .color(backgroundColor);
 
+    int textColor = this.getTextColor();
     boolean roundedCorners = this.defaultConfig.roundedCorners().get();
     boolean outline = this.defaultConfig.outline().get();
     if (roundedCorners) {
       RECTANGLE_RENDERER
           .rounded(5)
-          .upperEdgeSoftness(0.2F)
-          .lowerEdgeSoftness(-0.5F);
+          .upperEdgeSoftness(0.2F);
 
       if (outline) {
         RECTANGLE_RENDERER
             .borderColor(textColor)
             .borderThickness(1);
+      } else {
+        RECTANGLE_RENDERER
+            .lowerEdgeSoftness(-0.5F);
       }
     }
 
     RECTANGLE_RENDERER.render(stack);
+
+    if (renderPressedSeparate) {
+      float width = bounds.getWidth() * transitionProgress;
+      float height = bounds.getHeight() * transitionProgress;
+
+      float x = bounds.getX() + (bounds.getWidth() - width) / 2;
+      float y = bounds.getY() + (bounds.getHeight() - height) / 2;
+      Color color = this.defaultConfig.pressedColor().get();
+
+      RECTANGLE_RENDERER
+          .pos(x, y)
+          .size(width, height)
+          .color(ColorUtil.toValue(color.get(), (int) (color.getAlpha() * transitionProgress)));
+
+      if (roundedCorners) {
+        RECTANGLE_RENDERER
+            .rounded(5)
+            .upperEdgeSoftness(0.2F)
+            .lowerEdgeSoftness(-0.5F);
+      }
+
+      RECTANGLE_RENDERER.render(stack);
+    }
 
     if (!roundedCorners && outline) {
       RECTANGLE_RENDERER
@@ -119,18 +157,16 @@ public class KeyStrokeWidget extends SimpleWidget {
     return this.keyStroke;
   }
 
-  public double getDistanceTo(KeyStrokeWidget widget) {
-    Bounds bounds = widget.bounds();
-    return this.getDistanceTo(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
-  }
+  private float getTransitionProgress() {
+    long timeElapsed = System.currentTimeMillis() - this.keyStroke.getLastPressedUpdate();
+    if (timeElapsed > 100) {
+      return 1.0F;
+    }
 
-  public double getDistanceTo(float x, float y, float width, float height) {
-    return Math.pow(
-        (x + width / 2) - this.bounds().getCenterX(),
-        2
-    ) + Math.pow(
-        (y + height / 2) - this.bounds().getCenterX(),
-        2
-    );
+    if (!this.keyStroke.isPressed()) {
+      return 1.0F - timeElapsed / 100.0F;
+    }
+
+    return timeElapsed / 100.0F;
   }
 }

@@ -35,6 +35,7 @@ public class KeyStrokeConfig {
   private float width = KeyStrokeGridWidget.DEFAULT_WIDTH;
 
   private transient boolean pressed;
+  private transient long lastPressedUpdate;
 
   public KeyStrokeConfig(Key key, float x, float y) {
     this.key = key;
@@ -45,7 +46,12 @@ public class KeyStrokeConfig {
   }
 
   public void updatePressed(boolean pressed) {
+    if (this.pressed == pressed) {
+      return;
+    }
+
     this.pressed = pressed;
+    this.lastPressedUpdate = System.currentTimeMillis();
   }
 
   public void updateWidth(Key key) {
@@ -79,5 +85,9 @@ public class KeyStrokeConfig {
 
   public Key key() {
     return this.key;
+  }
+
+  public long getLastPressedUpdate() {
+    return this.lastPressedUpdate;
   }
 }
