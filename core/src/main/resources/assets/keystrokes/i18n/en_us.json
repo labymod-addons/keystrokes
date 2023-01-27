@@ -39,6 +39,9 @@
         },
         "outline": {
           "name": "Outline"
+        },
+        "roundedCorners": {
+          "name": "Rounded Corners"
         }
       }
     }

@@ -50,13 +50,41 @@ public class KeyStrokeWidget extends SimpleWidget {
   public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
     super.renderWidget(stack, mouse, partialTicks);
 
-    Bounds bounds = this.bounds();
-    RECTANGLE_RENDERER.pos(bounds.rectangle(BoundsType.OUTER)).color(this.getBackgroundColor())
-        .render(stack);
     int textColor = this.getTextColor();
-    if (this.defaultConfig.outline().get()) {
-      RECTANGLE_RENDERER.renderOutline(stack, bounds.getX() + 1, bounds.getY() + 1,
-          bounds.getMaxX() - 1, bounds.getMaxY() - 1, textColor, 1);
+
+    Bounds bounds = this.bounds();
+    RECTANGLE_RENDERER
+        .pos(bounds.rectangle(BoundsType.OUTER))
+        .color(this.getBackgroundColor());
+
+    boolean roundedCorners = this.defaultConfig.roundedCorners().get();
+    boolean outline = this.defaultConfig.outline().get();
+    if (roundedCorners) {
+      RECTANGLE_RENDERER
+          .rounded(5)
+          .upperEdgeSoftness(0.2F)
+          .lowerEdgeSoftness(-0.5F);
+
+      if (outline) {
+        RECTANGLE_RENDERER
+            .borderColor(textColor)
+            .borderThickness(1);
+      }
+    }
+
+    RECTANGLE_RENDERER.render(stack);
+
+    if (!roundedCorners && outline) {
+      RECTANGLE_RENDERER
+          .renderOutline(
+              stack,
+              bounds.getX() + 1,
+              bounds.getY() + 1,
+              bounds.getMaxX() - 1,
+              bounds.getMaxY() - 1,
+              textColor,
+              1
+          );
     }
 
     TextRenderer textRenderer = RENDER_PIPELINE.textRenderer();

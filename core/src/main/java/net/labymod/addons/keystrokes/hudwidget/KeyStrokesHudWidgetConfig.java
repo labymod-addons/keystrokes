@@ -53,6 +53,9 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   @SwitchSetting
   private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
 
+  @SwitchSetting
+  private final ConfigProperty<Boolean> roundedCorners = new ConfigProperty<>(false);
+
   private final ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(
       new HashSet<>());
 
@@ -84,6 +87,10 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   public ConfigProperty<Boolean> outline() {
     return this.outline;
+  }
+
+  public ConfigProperty<Boolean> roundedCorners() {
+    return this.roundedCorners;
   }
 
   public KeyStrokeConfig anchorConfig() {

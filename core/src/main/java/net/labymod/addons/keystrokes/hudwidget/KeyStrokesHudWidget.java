@@ -27,7 +27,6 @@ import net.labymod.api.event.client.input.KeyEvent;
 import net.labymod.api.event.client.input.KeyEvent.State;
 import net.labymod.api.event.client.input.MouseButtonEvent;
 import net.labymod.api.event.client.input.MouseButtonEvent.Action;
-import net.labymod.api.util.bounds.Rectangle;
 
 public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConfig> {
 
@@ -88,11 +87,5 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
   @Subscribe
   public void onKeyStrokeUpdate(KeyStrokeUpdateEvent event) {
     this.requestUpdate();
-  }
-
-  @Override
-  public void onBoundsChanged(AbstractWidget<Widget> widget, Rectangle previousRect,
-      Rectangle newRect) {
-
   }
 }
