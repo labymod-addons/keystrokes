@@ -1,9 +1,4 @@
-@import
-
-super
-(
-)
-;
+@import super();
 
 .content {
   use-floating-point-position: false;
@@ -23,7 +18,6 @@ super
 
   .manage-button-container {
     space-between-entries: 2;
-
     .button {
       padding-left: 10;
       padding-right: 10;
