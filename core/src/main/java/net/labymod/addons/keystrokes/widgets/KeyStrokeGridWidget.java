@@ -20,11 +20,9 @@ import java.awt.*;
 import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
-import net.labymod.api.client.gui.screen.AutoAlignType;
 import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
-import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.matrix.Stack;
@@ -231,10 +229,5 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
 
   public float getMaxY() {
     return this.maxY;
-  }
-
-  @Override
-  public boolean hasAutoBounds(Widget child, AutoAlignType type) {
-    return true;
   }
 }

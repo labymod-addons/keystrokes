@@ -24,6 +24,7 @@ import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.SimpleWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.BoundsType;
+import net.labymod.api.client.render.RenderPipeline;
 import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.font.text.TextRenderer;
 import net.labymod.api.client.render.matrix.Stack;
@@ -31,9 +32,8 @@ import net.labymod.api.client.render.matrix.Stack;
 public class KeyStrokeWidget extends SimpleWidget {
 
   public static final int PADDING = 4;
-  private static final TextRenderer TEXT_RENDERER = Laby.labyAPI().renderPipeline().textRenderer();
-  private static final RectangleRenderer RECTANGLE_RENDERER = Laby.labyAPI().renderPipeline()
-      .rectangleRenderer();
+  private static final RenderPipeline RENDER_PIPELINE = Laby.labyAPI().renderPipeline();
+  private static final RectangleRenderer RECTANGLE_RENDERER = RENDER_PIPELINE.rectangleRenderer();
 
   private final Key key;
   private final KeyStrokeConfig keyStroke;
@@ -59,8 +59,9 @@ public class KeyStrokeWidget extends SimpleWidget {
           bounds.getMaxX() - 1, bounds.getMaxY() - 1, textColor, 1);
     }
 
-    TEXT_RENDERER
-        .pos(bounds.getCenterX() + 0.4F, bounds.getCenterY() - (TEXT_RENDERER.height() / 2) + 0.8F)
+    TextRenderer textRenderer = RENDER_PIPELINE.textRenderer();
+    textRenderer
+        .pos(bounds.getCenterX() + 0.4F, bounds.getCenterY() - (textRenderer.height() / 2) + 0.8F)
         .useFloatingPointPosition(true)
         .color(textColor)
         .shadow(true)
@@ -88,5 +89,20 @@ public class KeyStrokeWidget extends SimpleWidget {
 
   public KeyStrokeConfig config() {
     return this.keyStroke;
+  }
+
+  public double getDistanceTo(KeyStrokeWidget widget) {
+    Bounds bounds = widget.bounds();
+    return this.getDistanceTo(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+  }
+
+  public double getDistanceTo(float x, float y, float width, float height) {
+    return Math.pow(
+        (x + width / 2) - this.bounds().getCenterX(),
+        2
+    ) + Math.pow(
+        (y + height / 2) - this.bounds().getCenterX(),
+        2
+    );
   }
 }

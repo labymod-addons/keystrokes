@@ -21,19 +21,27 @@ import java.util.function.Consumer;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
+import net.labymod.addons.keystrokes.util.AnchorController;
+import net.labymod.addons.keystrokes.util.AnchorController.Anchor;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.api.Laby;
+import net.labymod.api.client.component.format.NamedTextColor;
+import net.labymod.api.client.gui.HorizontalAlignment;
+import net.labymod.api.client.gui.VerticalAlignment;
 import net.labymod.api.client.gui.lss.property.annotation.AutoWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
+import net.labymod.api.client.gui.screen.key.KeyHandler;
 import net.labymod.api.client.gui.screen.key.MouseButton;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.draw.RectangleRenderer;
+import net.labymod.api.client.render.font.FontSize.PredefinedFontSize;
 import net.labymod.api.client.render.matrix.Stack;
+import net.labymod.api.util.I18n;
 import net.labymod.api.util.bounds.Point;
 import net.labymod.api.util.bounds.Rectangle;
 
@@ -42,11 +50,16 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
 
   private static final RectangleRenderer RECTANGLE_RENDERER = Laby.labyAPI().renderPipeline()
       .rectangleRenderer();
+  private static final AnchorController CONTROLLER = new AnchorController();
+
   private static final Key CLICK_KEY = MouseButton.LEFT;
 
   private static final long DRAGGING_DELAY = 100L;
 
   private final Consumer<KeyStrokeConfig> selectConsumer;
+
+  private final String disableDocking;
+  private final String disabledDocking;
 
   private KeyStrokeWidget selected;
   private long draggingStartTime;
@@ -60,6 +73,8 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
     super(config);
 
     this.selectConsumer = selectConsumer;
+    this.disableDocking = I18n.translate("keystrokes.activity.edit.docking.disable");
+    this.disabledDocking = I18n.translate("keystrokes.activity.edit.docking.disabled");
   }
 
   @Override
@@ -93,24 +108,41 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
 
     Bounds parentBounds = this.bounds();
     Bounds bounds = this.selected.bounds();
+    float width = bounds.getWidth();
     float x = mouse.getX() - this.offsetX;
     if (x < parentBounds.getX()) {
       x = parentBounds.getX();
-    } else if (x + bounds.getWidth() > parentBounds.getMaxX()) {
-      x = parentBounds.getMaxX() - bounds.getWidth();
+    } else {
+      if (x + width > parentBounds.getMaxX()) {
+        x = parentBounds.getMaxX() - width;
+      }
     }
 
+    float height = bounds.getHeight();
     float y = mouse.getY() - this.offsetY;
     if (y < parentBounds.getY()) {
       y = parentBounds.getY();
-    } else if (y + bounds.getHeight() > parentBounds.getMaxY()) {
-      y = parentBounds.getMaxY() - bounds.getHeight();
+    } else {
+      if (y + height > parentBounds.getMaxY()) {
+        y = parentBounds.getMaxY() - height;
+      }
     }
 
-    bounds.setOuterPosition(x, y, REASON);
+    Anchor anchor = CONTROLLER.updateAnchor(this.children, this.selected, x, y, width, height);
+    this.highlightAnchor(stack, anchor);
 
+    bounds.setOuterPosition(x, y, REASON);
     this.selected.render(stack, mouse, partialTicks);
     this.highlightSelected(stack);
+
+    String infoText = KeyHandler.isControlDown() ? this.disabledDocking : this.disableDocking;
+    this.labyAPI.renderPipeline().textRenderer()
+        .text(infoText)
+        .color(NamedTextColor.GRAY.getValue())
+        .scale(PredefinedFontSize.SMALL.fontSize().getFontSize())
+        .pos(this.bounds().getCenterX(), this.bounds().getMaxY() - 10)
+        .centered(true)
+        .render(stack);
   }
 
   @Override
@@ -149,6 +181,30 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
       return true;
     }
 
+    Anchor anchor = CONTROLLER.anchor();
+    if (anchor.isValid()) {
+      Bounds bounds = this.selected.bounds();
+      Bounds anchorBounds = anchor.getWidget().bounds();
+
+      float x = 0;
+      float y = 0;
+      HorizontalAlignment horizontalSide = anchor.getHorizontalSide();
+      if (horizontalSide == HorizontalAlignment.LEFT) {
+        x -= bounds.getWidth() + 2;
+      } else if (horizontalSide == HorizontalAlignment.RIGHT) {
+        x += anchorBounds.getWidth() + 2;
+      }
+
+      VerticalAlignment verticalSide = anchor.getVerticalSide();
+      if (verticalSide == VerticalAlignment.TOP) {
+        y -= bounds.getHeight() + 2;
+      } else if (verticalSide == VerticalAlignment.BOTTOM) {
+        y += anchorBounds.getHeight() + 2;
+      }
+
+      bounds.setOuterPosition(anchorBounds.getX() + x, anchorBounds.getY() + y, REASON);
+    }
+
     if (this.updateKeyStrokePosition(this.selected)) {
       this.updateSize();
       Laby.fireEvent(new KeyStrokeUpdateEvent(false));
@@ -178,6 +234,39 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
   public void reload() {
     super.reload();
     this.updateWidgetBounds(this.bounds());
+  }
+
+  private void highlightAnchor(Stack stack, Anchor anchor) {
+    if (!anchor.isValid()) {
+      return;
+    }
+
+    Bounds bounds = anchor.getWidget().bounds();
+    HorizontalAlignment horizontalSide = anchor.getHorizontalSide();
+    if (horizontalSide == HorizontalAlignment.LEFT) {
+      RECTANGLE_RENDERER
+          .pos(bounds.getX() - 1, bounds.getY(), bounds.getX(), bounds.getMaxY())
+          .color(Color.WHITE)
+          .render(stack);
+    } else if (horizontalSide == HorizontalAlignment.RIGHT) {
+      RECTANGLE_RENDERER
+          .pos(bounds.getMaxX(), bounds.getY(), bounds.getMaxX() + 1, bounds.getMaxY())
+          .color(Color.WHITE)
+          .render(stack);
+    }
+
+    VerticalAlignment verticalSide = anchor.getVerticalSide();
+    if (verticalSide == VerticalAlignment.TOP) {
+      RECTANGLE_RENDERER
+          .pos(bounds.getX(), bounds.getY() - 1, bounds.getMaxX(), bounds.getY())
+          .color(Color.WHITE)
+          .render(stack);
+    } else if (verticalSide == VerticalAlignment.BOTTOM) {
+      RECTANGLE_RENDERER
+          .pos(bounds.getX(), bounds.getMaxY(), bounds.getMaxX(), bounds.getMaxY() + 1)
+          .color(Color.WHITE)
+          .render(stack);
+    }
   }
 
   private void highlightSelected(Stack stack) {

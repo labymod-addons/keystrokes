@@ -15,6 +15,10 @@
         },
         "remove": {
           "text": "Remove Key"
+        },
+        "docking": {
+          "disable": "Hold CTRL to disable docking",
+          "disabled": "Docking disabled"
         }
       }
     },
