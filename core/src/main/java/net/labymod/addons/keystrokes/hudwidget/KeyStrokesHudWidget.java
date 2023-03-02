@@ -44,6 +44,8 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
     if (keyStrokes == null || keyStrokes.isEmpty()) {
       config.setDefaultKeyStrokes();
     }
+
+    config.refreshCPSTracking();
   }
 
   @Override

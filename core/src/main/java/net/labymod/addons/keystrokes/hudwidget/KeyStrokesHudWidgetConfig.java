@@ -26,6 +26,7 @@ import net.labymod.api.Laby;
 import net.labymod.api.client.gui.hud.hudwidget.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.key.Key;
+import net.labymod.api.client.gui.screen.key.MouseButton;
 import net.labymod.api.client.gui.screen.widget.widgets.activity.settings.AddonActivityWidget.AddonActivitySetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.SwitchWidget.SwitchSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.color.ColorPickerWidget.ColorPickerSetting;
@@ -61,6 +62,12 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   @SwitchSetting
   private final ConfigProperty<Boolean> transition = new ConfigProperty<>(true);
+
+  public ConfigProperty<Boolean> trackMouseCPS() {
+    return this.trackMouseCPS;
+  }  @SwitchSetting
+  private final ConfigProperty<Boolean> trackMouseCPS = new ConfigProperty<>(true)
+      .addChangeListener((property, oldValue, newValue) -> this.refreshCPSTracking());
 
   private final ConfigProperty<Set<KeyStrokeConfig>> keyStrokes = ConfigProperty.create(
       new HashSet<>());
@@ -103,6 +110,21 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return this.transition;
   }
 
+  public void setDefaultKeyStrokes() {
+    Set<KeyStrokeConfig> keyStrokes = new HashSet<>();
+    keyStrokes.add(new KeyStrokeConfig(Key.W, 0, -22));
+    keyStrokes.add(new KeyStrokeConfig(Key.A, -22, 0));
+    keyStrokes.add(new KeyStrokeConfig(Key.S, 22, 22));
+    keyStrokes.add(new KeyStrokeConfig(Key.D, 22, 0));
+    keyStrokes.add(new KeyStrokeConfig(MouseButton.LEFT, -22, 22));
+    keyStrokes.add(new KeyStrokeConfig(MouseButton.RIGHT, 11, 22));
+    if (this.anchorConfig() == null) {
+      this.base.reset();
+    }
+
+    this.keyStrokes.set(keyStrokes);
+  }
+
   public KeyStrokeConfig anchorConfig() {
     return this.getKeyStroke(this.base.get());
   }
@@ -134,12 +156,21 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return this.keyStrokes.get().remove(keyStrokeConfig);
   }
 
-  public void setDefaultKeyStrokes() {
-    Set<KeyStrokeConfig> keyStrokes = new HashSet<>();
-    keyStrokes.add(new KeyStrokeConfig(Key.W, 0, -22));
-    keyStrokes.add(new KeyStrokeConfig(Key.A, -22, 0));
-    keyStrokes.add(new KeyStrokeConfig(Key.S, 22, 22));
-    keyStrokes.add(new KeyStrokeConfig(Key.D, 22, 0));
-    this.keyStrokes.set(keyStrokes);
+  public void refreshCPSTracking() {
+    boolean tracking = this.trackMouseCPS.get();
+    for (KeyStrokeConfig keyStrokeConfig : this.keyStrokes.get()) {
+      Key key = keyStrokeConfig.key();
+      if (key != MouseButton.LEFT && key != MouseButton.RIGHT) {
+        continue;
+      }
+
+      if (tracking) {
+        keyStrokeConfig.enableKeyTracking();
+      } else {
+        keyStrokeConfig.disableKeyTracking();
+      }
+    }
   }
+
+
 }

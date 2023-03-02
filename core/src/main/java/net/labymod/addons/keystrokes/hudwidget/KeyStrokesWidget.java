@@ -16,6 +16,8 @@
 
 package net.labymod.addons.keystrokes.hudwidget;
 
+import net.labymod.addons.keystrokes.KeyStrokeConfig;
+import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
@@ -40,6 +42,13 @@ public class KeyStrokesWidget extends KeyStrokeGridWidget {
 
   @Override
   public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
+    for (KeyStrokeConfig keyStroke : this.config.getKeyStrokes()) {
+      KeyTracker keyTracker = keyStroke.getKeyTracker();
+      if (keyTracker != null) {
+        keyTracker.update();
+      }
+    }
+
     stack.push();
     stack.translate(this.parent.bounds().getX(), this.parent.bounds().getY(), 0);
     super.renderWidget(stack, mouse, partialTicks);

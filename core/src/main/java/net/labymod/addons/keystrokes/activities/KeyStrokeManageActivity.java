@@ -90,6 +90,10 @@ public class KeyStrokeManageActivity extends Activity {
     addButton.setPressable(() -> {
       this.overlayWidget.setVisible(true);
       this.addCallback = config -> {
+        if (this.hudWidgetConfig.trackMouseCPS().get()) {
+          config.enableKeyTracking();
+        }
+
         this.hudWidgetConfig.addKeyStroke(config);
         this.manageWidget.select(config);
         Laby.fireEvent(new KeyStrokeUpdateEvent(true));

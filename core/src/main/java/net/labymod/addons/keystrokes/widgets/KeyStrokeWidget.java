@@ -18,6 +18,7 @@ package net.labymod.addons.keystrokes.widgets;
 
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
+import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.key.Key;
@@ -126,14 +127,43 @@ public class KeyStrokeWidget extends SimpleWidget {
     }
 
     TextRenderer textRenderer = RENDER_PIPELINE.textRenderer();
+    KeyTracker keyTracker = this.keyStroke.getKeyTracker();
+    float fontHeight = textRenderer.height();
+    float y = bounds.getCenterY() - (textRenderer.height() / 2) + 0.8F;
+    if (keyTracker != null) {
+      y -= fontHeight * 0.25F;
+    }
+
+    float x = bounds.getCenterX() + 0.4F;
     textRenderer
-        .pos(bounds.getCenterX() + 0.4F, bounds.getCenterY() - (textRenderer.height() / 2) + 0.8F)
+        .pos(
+            x,
+            y
+        )
         .useFloatingPointPosition(true)
         .color(textColor)
         .shadow(true)
         .centered(true)
-        .text(this.key.getName())
+        .text(this.keyStroke.getKeyName())
         .render(stack);
+
+    if (keyTracker != null) {
+      stack.push();
+      stack.translate(x, y, 0);
+      stack.scale(0.5F);
+      textRenderer
+          .pos(
+              0,
+              fontHeight * 1.5F + 3
+          )
+          .useFloatingPointPosition(true)
+          .color(textColor)
+          .shadow(true)
+          .centered(true)
+          .text(keyTracker.getCount() + " CPS")
+          .render(stack);
+      stack.pop();
+    }
   }
 
   private int getBackgroundColor() {

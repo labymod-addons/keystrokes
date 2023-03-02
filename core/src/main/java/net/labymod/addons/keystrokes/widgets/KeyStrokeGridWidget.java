@@ -20,6 +20,7 @@ import java.awt.*;
 import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
+import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
@@ -53,6 +54,11 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
   public void initialize(Parent parent) {
     super.initialize(parent);
     this.reload = true;
+  }
+
+  @Override
+  public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
+    super.renderWidget(stack, mouse, partialTicks);
   }
 
   protected void updateWidgetBounds(Rectangle bounds) {

@@ -16,10 +16,12 @@
 
 package net.labymod.addons.keystrokes;
 
+import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.screen.key.Key;
+import net.labymod.api.client.gui.screen.key.MouseButton;
 import net.labymod.api.client.render.font.text.TextRenderer;
 
 @SuppressWarnings("FieldMayBeFinal")
@@ -36,6 +38,7 @@ public class KeyStrokeConfig {
 
   private transient boolean pressed;
   private transient long lastPressedUpdate;
+  private transient KeyTracker keyTracker;
 
   public KeyStrokeConfig(Key key, float x, float y) {
     this.key = key;
@@ -50,16 +53,24 @@ public class KeyStrokeConfig {
       return;
     }
 
+    if (pressed && this.keyTracker != null) {
+      this.keyTracker.press();
+    }
+
     this.pressed = pressed;
     this.lastPressedUpdate = System.currentTimeMillis();
   }
 
   public void updateWidth(Key key) {
-    float width = TEXT_RENDERER.width(key.getName());
     int padding = KeyStrokeWidget.PADDING * 2;
-    if (this.width < width + padding) {
-      this.width = width + padding;
+    float actualWidth = TEXT_RENDERER.width(this.getKeyName()) + padding;
+    float defaultWidth = KeyStrokeGridWidget.DEFAULT_WIDTH;
+    if (key == MouseButton.LEFT || key == MouseButton.MIDDLE
+        || key == MouseButton.RIGHT) {
+      defaultWidth = defaultWidth * 1.5F + 1;
     }
+
+    this.width = Math.max(actualWidth, defaultWidth);
   }
 
   public float getX() {
@@ -87,7 +98,48 @@ public class KeyStrokeConfig {
     return this.key;
   }
 
+  public String getKeyName() {
+    Key key = this.key;
+    if (!(key instanceof MouseButton)) {
+      return key.getName();
+    }
+
+    if (key == MouseButton.LEFT) {
+      return "LMB";
+    }
+
+    if (key == MouseButton.RIGHT) {
+      return "RMB";
+    }
+
+    if (key == MouseButton.MIDDLE) {
+      return "MMB";
+    }
+
+    return key.getName();
+  }
+
   public long getLastPressedUpdate() {
     return this.lastPressedUpdate;
+  }
+
+  public void enableKeyTracking() {
+    if (this.keyTracker != null) {
+      return;
+    }
+
+    this.keyTracker = new KeyTracker();
+  }
+
+  public void disableKeyTracking() {
+    if (this.keyTracker == null) {
+      return;
+    }
+
+    this.keyTracker = null;
+  }
+
+  public KeyTracker getKeyTracker() {
+    return this.keyTracker;
   }
 }

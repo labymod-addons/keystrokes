@@ -45,6 +45,9 @@
         },
         "transition": {
           "name": "Transition"
+        },
+        "trackMouseCPS": {
+          "name": "Track Mouse CPS"
         }
       }
     }
