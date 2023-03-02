@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     api(project(":api"))
+    compileOnly("it.unimi.dsi:fastutil:8.5.6")
 }
 
 labyModProcessor {

@@ -1,7 +1,7 @@
 rootProject.name = "keystrokes-addon"
 
 pluginManagement {
-    val labyGradlePluginVersion = "0.3.7"
+    val labyGradlePluginVersion = "0.3.18"
     plugins {
         id("net.labymod.gradle") version (labyGradlePluginVersion)
     }
