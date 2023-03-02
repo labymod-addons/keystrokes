@@ -225,6 +225,7 @@ public class KeyStrokeManageActivity extends Activity {
   public void onCloseScreen() {
     super.onCloseScreen();
     Laby.fireEvent(new KeyStrokeUpdateEvent(false));
+    Laby.references().hudWidgetRegistry().saveConfig();
   }
 
   @Override
