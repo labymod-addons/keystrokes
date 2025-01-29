@@ -25,6 +25,7 @@ import net.labymod.api.Laby;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.LabyScreen;
 import net.labymod.api.client.gui.screen.Parent;
+import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.activity.AutoActivity;
 import net.labymod.api.client.gui.screen.activity.Link;
@@ -212,17 +213,23 @@ public class KeyStrokeManageActivity extends Activity {
   }
 
   @Override
-  public void render(Stack stack, MutableMouse mouse, float partialTicks) {
+  public void render(ScreenContext context) {
     if (this.overlayWidget == null || !this.overlayWidget.isVisible()) {
-      super.render(stack, mouse, partialTicks);
+      super.render(context);
       return;
     }
 
     if (this.content != null) {
-      this.content.render(stack, DUMMY_MOUSE, partialTicks);
+      MutableMouse prevMouse = context.mouse();
+      try {
+        context.setMouse(DUMMY_MOUSE);
+        this.content.render(context);
+      } finally {
+        context.setMouse(prevMouse);
+      }
     }
 
-    this.overlayWidget.render(stack, mouse, partialTicks);
+    this.overlayWidget.render(context);
   }
 
   @Override
@@ -279,11 +286,6 @@ public class KeyStrokeManageActivity extends Activity {
   @Override
   public boolean shouldHandleEscape() {
     return this.overlayWidget != null && this.overlayWidget.isVisible();
-  }
-
-  @Override
-  public <T extends LabyScreen> @Nullable T renew() {
-    return new KeyStrokeManageActivity(this.hudWidgetConfig).generic();
   }
 
   @Subscribe

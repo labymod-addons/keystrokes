@@ -20,7 +20,7 @@ import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.api.Laby;
-import net.labymod.api.client.gui.mouse.MutableMouse;
+import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.SimpleWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
@@ -30,7 +30,7 @@ import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.font.text.TextRenderer;
 import net.labymod.api.client.render.matrix.Stack;
 import net.labymod.api.util.Color;
-import net.labymod.api.util.ColorUtil;
+import net.labymod.api.util.color.format.ColorFormat;
 
 public class KeyStrokeWidget extends SimpleWidget {
 
@@ -50,8 +50,8 @@ public class KeyStrokeWidget extends SimpleWidget {
   }
 
   @Override
-  public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
-    super.renderWidget(stack, mouse, partialTicks);
+  public void renderWidget(ScreenContext context) {
+    super.renderWidget(context);
 
     Bounds bounds = this.bounds();
     boolean transition = this.defaultConfig.transition().get();
@@ -88,6 +88,7 @@ public class KeyStrokeWidget extends SimpleWidget {
       }
     }
 
+    Stack stack = context.stack();
     RECTANGLE_RENDERER.render(stack);
 
     if (renderPressedSeparate) {
@@ -101,7 +102,7 @@ public class KeyStrokeWidget extends SimpleWidget {
       RECTANGLE_RENDERER
           .pos(x, y)
           .size(width, height)
-          .color(ColorUtil.toValue(color.get(), (int) (color.getAlpha() * transitionProgress)));
+          .color(ColorFormat.ARGB32.pack(color.get(), (int) (color.getAlpha() * transitionProgress)));
 
       if (roundedCorners) {
         RECTANGLE_RENDERER

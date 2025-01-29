@@ -21,6 +21,7 @@ import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
+import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.render.matrix.Stack;
 
@@ -41,7 +42,7 @@ public class KeyStrokesWidget extends KeyStrokeGridWidget {
   }
 
   @Override
-  public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
+  public void renderWidget(ScreenContext context) {
     for (KeyStrokeConfig keyStroke : this.config.getKeyStrokes()) {
       KeyTracker keyTracker = keyStroke.getKeyTracker();
       if (keyTracker != null) {
@@ -49,9 +50,9 @@ public class KeyStrokesWidget extends KeyStrokeGridWidget {
       }
     }
 
-    stack.push();
-    stack.translate(this.parent.bounds().getX(), this.parent.bounds().getY(), 0);
-    super.renderWidget(stack, mouse, partialTicks);
-    stack.pop();
+    context.pushStack();
+    context.translate(this.parent.bounds().getX(), this.parent.bounds().getY(), 0);
+    super.renderWidget(context);
+    context.popStack();
   }
 }
