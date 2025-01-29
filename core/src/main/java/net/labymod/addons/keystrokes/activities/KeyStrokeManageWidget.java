@@ -32,6 +32,7 @@ import net.labymod.api.client.gui.VerticalAlignment;
 import net.labymod.api.client.gui.lss.property.annotation.AutoWidget;
 import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
+import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.KeyHandler;
 import net.labymod.api.client.gui.screen.key.MouseButton;
@@ -84,15 +85,16 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
   }
 
   @Override
-  public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
+  public void renderWidget(ScreenContext context) {
     if (this.selected == null) {
-      super.renderWidget(stack, mouse, partialTicks);
+      super.renderWidget(context);
       return;
     }
 
+    Stack stack = context.stack();
     if (this.draggingStartTime == -1
         || this.draggingStartTime + DRAGGING_DELAY > System.currentTimeMillis()) {
-      super.renderWidget(stack, mouse, partialTicks);
+      super.renderWidget(context);
       this.highlightSelected(stack);
       return;
     }
@@ -103,8 +105,10 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
         continue;
       }
 
-      child.render(stack, mouse, partialTicks);
+      child.render(context);
     }
+
+    MutableMouse mouse = context.mouse();
 
     Bounds parentBounds = this.bounds();
     Bounds bounds = this.selected.bounds();
@@ -132,7 +136,7 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
     this.highlightAnchor(stack, anchor);
 
     bounds.setOuterPosition(x, y, REASON);
-    this.selected.render(stack, mouse, partialTicks);
+    this.selected.render(context);
     this.highlightSelected(stack);
 
     String infoText = KeyHandler.isControlDown() ? this.disabledDocking : this.disableDocking;

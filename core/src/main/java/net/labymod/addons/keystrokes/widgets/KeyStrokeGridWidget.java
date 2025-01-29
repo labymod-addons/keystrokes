@@ -56,11 +56,6 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
     this.reload = true;
   }
 
-  @Override
-  public void renderWidget(Stack stack, MutableMouse mouse, float partialTicks) {
-    super.renderWidget(stack, mouse, partialTicks);
-  }
-
   protected void updateWidgetBounds(Rectangle bounds) {
     this.updateWidgetBounds(Point.fixed((int) bounds.getX(), (int) bounds.getY()), true, false);
   }

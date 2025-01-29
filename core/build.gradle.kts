@@ -1,21 +1,10 @@
-plugins {
-    id("java-library")
-}
-
-repositories {
-    mavenLocal()
-}
+import net.labymod.labygradle.common.extension.LabyModAnnotationProcessorExtension.ReferenceType
 
 dependencies {
+    labyProcessor()
     api(project(":api"))
-    compileOnly("it.unimi.dsi:fastutil:8.5.6")
 }
 
-labyModProcessor {
-    referenceType = net.labymod.gradle.core.processor.ReferenceType.DEFAULT
-}
-
-tasks.compileJava {
-    sourceCompatibility = JavaVersion.VERSION_1_8.toString()
-    targetCompatibility = JavaVersion.VERSION_1_8.toString()
+labyModAnnotationProcessor {
+    referenceType = ReferenceType.DEFAULT
 }

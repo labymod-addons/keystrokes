@@ -24,7 +24,9 @@ import net.labymod.api.client.gui.hud.hudwidget.widget.WidgetHudWidget;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.Widget;
+import net.labymod.api.client.gui.screen.widget.widgets.hud.HudWidgetWidget;
 import net.labymod.api.event.Subscribe;
+import net.labymod.api.event.client.gui.screen.ScreenDisplayEvent;
 import net.labymod.api.event.client.gui.screen.ScreenOpenEvent;
 import net.labymod.api.event.client.input.KeyEvent;
 import net.labymod.api.event.client.input.KeyEvent.State;
@@ -49,7 +51,7 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
   }
 
   @Override
-  public void initialize(AbstractWidget<Widget> widget) {
+  public void initialize(HudWidgetWidget widget) {
     super.initialize(widget);
     widget.setStencil(false);
     KeyStrokesWidget keyStrokesWidget = new KeyStrokesWidget(this.config);
@@ -73,11 +75,11 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
 
   @Subscribe
   public void onKeyStrokeUpdate(KeyStrokeUpdateEvent event) {
-    this.requestUpdate();
+    this.requestUpdate("key_stroke_update");
   }
 
   @Subscribe
-  public void onScreenOpen(ScreenOpenEvent event) {
+  public void onScreenOpen(ScreenDisplayEvent event) {
     if (event.getPreviousScreen() != null) {
       return;
     }

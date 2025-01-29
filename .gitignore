@@ -75,3 +75,4 @@ build-data.txt
 
 # Don't ignore libraries
 !libs/*.jar
+.assetsroot
