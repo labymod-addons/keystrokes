@@ -16,22 +16,20 @@
 
 package net.labymod.addons.keystrokes.hudwidget;
 
-import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.hud.hudwidget.widget.WidgetHudWidget;
 import net.labymod.api.client.gui.screen.key.Key;
-import net.labymod.api.client.gui.screen.widget.AbstractWidget;
-import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.widgets.hud.HudWidgetWidget;
 import net.labymod.api.event.Subscribe;
 import net.labymod.api.event.client.gui.screen.ScreenDisplayEvent;
-import net.labymod.api.event.client.gui.screen.ScreenOpenEvent;
 import net.labymod.api.event.client.input.KeyEvent;
 import net.labymod.api.event.client.input.KeyEvent.State;
 import net.labymod.api.event.client.input.MouseButtonEvent;
 import net.labymod.api.event.client.input.MouseButtonEvent.Action;
+
+import java.util.Set;
 
 public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConfig> {
 
@@ -48,6 +46,7 @@ public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConf
     }
 
     config.refreshCPSTracking();
+    config.updateSpace(false);
   }
 
   @Override

@@ -36,12 +36,13 @@ import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.KeyHandler;
 import net.labymod.api.client.gui.screen.key.MouseButton;
+import net.labymod.api.client.gui.screen.state.ScreenCanvas;
+import net.labymod.api.client.gui.screen.state.TextFlags;
+import net.labymod.api.client.gui.screen.state.states.GuiRectangleRenderState.RectConfig;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.Widget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
-import net.labymod.api.client.render.draw.RectangleRenderer;
 import net.labymod.api.client.render.font.FontSize.PredefinedFontSize;
-import net.labymod.api.client.render.matrix.Stack;
 import net.labymod.api.util.I18n;
 import net.labymod.api.util.bounds.Point;
 import net.labymod.api.util.bounds.Rectangle;
@@ -49,8 +50,6 @@ import net.labymod.api.util.bounds.Rectangle;
 @AutoWidget
 public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
 
-  private static final RectangleRenderer RECTANGLE_RENDERER = Laby.labyAPI().renderPipeline()
-      .rectangleRenderer();
   private static final AnchorController CONTROLLER = new AnchorController();
 
   private static final Key CLICK_KEY = MouseButton.LEFT;
@@ -91,15 +90,14 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
       return;
     }
 
-    Stack stack = context.stack();
     if (this.draggingStartTime == -1
         || this.draggingStartTime + DRAGGING_DELAY > System.currentTimeMillis()) {
       super.renderWidget(context);
-      this.highlightSelected(stack);
+      this.highlightSelected(context);
       return;
     }
 
-    super.renderDebug(stack);
+    super.renderDebug(context);
     for (Widget child : this.children) {
       if (child == this.selected) {
         continue;
@@ -133,20 +131,21 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
     }
 
     Anchor anchor = CONTROLLER.updateAnchor(this.children, this.selected, x, y, width, height);
-    this.highlightAnchor(stack, anchor);
+    this.highlightAnchor(context, anchor);
 
     bounds.setOuterPosition(x, y, REASON);
     this.selected.render(context);
-    this.highlightSelected(stack);
+    this.highlightSelected(context);
 
     String infoText = KeyHandler.isControlDown() ? this.disabledDocking : this.disableDocking;
-    this.labyAPI.renderPipeline().textRenderer()
-        .text(infoText)
-        .color(NamedTextColor.GRAY.getValue())
-        .scale(PredefinedFontSize.SMALL.fontSize().getFontSize())
-        .pos(this.bounds().getCenterX(), this.bounds().getMaxY() - 10)
-        .centered(true)
-        .render(stack);
+
+    context.canvas().submitText(
+        infoText,
+        this.bounds().getCenterX(), this.bounds().getMaxY() - 10,
+        NamedTextColor.GRAY.getValue(),
+        PredefinedFontSize.SMALL,
+        TextFlags.CENTERED | TextFlags.SHADOW
+    );
   }
 
   @Override
@@ -240,81 +239,106 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
     this.updateWidgetBounds(this.bounds());
   }
 
-  private void highlightAnchor(Stack stack, Anchor anchor) {
+  private void highlightAnchor(ScreenContext context, Anchor anchor) {
     if (!anchor.isValid()) {
       return;
     }
 
+    ScreenCanvas canvas = context.canvas();
+
     Bounds bounds = anchor.getWidget().bounds();
     HorizontalAlignment horizontalSide = anchor.getHorizontalSide();
     if (horizontalSide == HorizontalAlignment.LEFT) {
-      RECTANGLE_RENDERER
-          .pos(bounds.getX() - 1, bounds.getY(), bounds.getX(), bounds.getMaxY())
-          .color(Color.WHITE)
-          .render(stack);
+      canvas.submitGuiRect(
+          Rectangle.absolute(
+              bounds.getX() - 1, bounds.getY(),
+              bounds.getX(), bounds.getMaxY()
+          ),
+          RectConfig.builder()
+              .setArgb(Color.WHITE.getRGB())
+              .build()
+      );
     } else if (horizontalSide == HorizontalAlignment.RIGHT) {
-      RECTANGLE_RENDERER
-          .pos(bounds.getMaxX(), bounds.getY(), bounds.getMaxX() + 1, bounds.getMaxY())
-          .color(Color.WHITE)
-          .render(stack);
+      canvas.submitGuiRect(
+          Rectangle.absolute(
+              bounds.getMaxX(), bounds.getY(),
+              bounds.getMaxX() + 1, bounds.getMaxY()
+          ),
+          RectConfig.builder()
+              .setArgb(Color.WHITE.getRGB())
+              .build()
+      );
     }
 
     VerticalAlignment verticalSide = anchor.getVerticalSide();
     if (verticalSide == VerticalAlignment.TOP) {
-      RECTANGLE_RENDERER
-          .pos(bounds.getX(), bounds.getY() - 1, bounds.getMaxX(), bounds.getY())
-          .color(Color.WHITE)
-          .render(stack);
+      canvas.submitGuiRect(
+          Rectangle.absolute(
+              bounds.getX(), bounds.getY() - 1,
+              bounds.getMaxX(), bounds.getY()
+          ),
+          RectConfig.builder()
+              .setArgb(Color.WHITE.getRGB())
+              .build()
+      );
     } else if (verticalSide == VerticalAlignment.BOTTOM) {
-      RECTANGLE_RENDERER
-          .pos(bounds.getX(), bounds.getMaxY(), bounds.getMaxX(), bounds.getMaxY() + 1)
-          .color(Color.WHITE)
-          .render(stack);
+      canvas.submitGuiRect(
+          Rectangle.absolute(
+              bounds.getX(), bounds.getMaxY(),
+              bounds.getMaxX(), bounds.getMaxY() + 1
+          ),
+          RectConfig.builder()
+              .setArgb(Color.WHITE.getRGB())
+              .build()
+      );
     }
   }
 
-  private void highlightSelected(Stack stack) {
+  private void highlightSelected(ScreenContext context) {
     Bounds parentBounds = this.bounds();
     Bounds bounds = this.selected.bounds();
-    RECTANGLE_RENDERER
-        .pos(
-            parentBounds.getX(),
-            bounds.getCenterY() - 0.5F,
-            bounds.getX(),
-            bounds.getCenterY() + 0.5F
-        )
-        .color(Color.GRAY.getRGB())
-        .render(stack);
 
-    RECTANGLE_RENDERER
-        .pos(
-            bounds.getCenterX() - 0.5F,
-            parentBounds.getY(),
-            bounds.getCenterX() + 0.5F,
-            bounds.getY()
-        )
-        .color(Color.GRAY.getRGB())
-        .render(stack);
+    ScreenCanvas canvas = context.canvas();
 
-    RECTANGLE_RENDERER
-        .pos(
-            bounds.getMaxX(),
-            bounds.getCenterY() - 0.5F,
-            parentBounds.getMaxX(),
-            bounds.getCenterY() + 0.5F
-        )
-        .color(Color.GRAY.getRGB())
-        .render(stack);
+    canvas.submitGuiRect(
+        parentBounds.getX(),
+        bounds.getCenterY() - 0.5F,
+        bounds.getX() - parentBounds.getX(),
+        1,
+        RectConfig.builder()
+            .setArgb(Color.GRAY.getRGB())
+            .build()
+    );
 
-    RECTANGLE_RENDERER
-        .pos(
-            bounds.getCenterX() - 0.5F,
-            parentBounds.getMaxY(),
-            bounds.getCenterX() + 0.5F,
-            bounds.getMaxY()
-        )
-        .color(Color.GRAY.getRGB())
-        .render(stack);
+    canvas.submitGuiRect(
+        bounds.getCenterX() - 0.5F,
+        parentBounds.getY(),
+        1,
+        bounds.getY() - parentBounds.getY(),
+        RectConfig.builder()
+            .setArgb(Color.GRAY.getRGB())
+            .build()
+    );
+
+    canvas.submitGuiRect(
+        bounds.getMaxX(),
+        bounds.getCenterY() - 0.5F,
+        parentBounds.getMaxX() - bounds.getMaxX(),
+        1,
+        RectConfig.builder()
+            .setArgb(Color.GRAY.getRGB())
+            .build()
+    );
+
+    canvas.submitGuiRect(
+        bounds.getCenterX() - 0.5F,
+        bounds.getMaxY(),
+        1,
+        parentBounds.getMaxY() - bounds.getMaxY(),
+        RectConfig.builder()
+            .setArgb(Color.GRAY.getRGB())
+            .build()
+    );
   }
 
   private boolean updateKeyStrokePosition(KeyStrokeWidget widget) {

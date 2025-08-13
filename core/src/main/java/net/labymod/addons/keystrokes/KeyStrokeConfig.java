@@ -16,18 +16,24 @@
 
 package net.labymod.addons.keystrokes;
 
+import static net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget.DEFAULT_HEIGHT;
+
+import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.api.Laby;
+import net.labymod.api.client.component.Component;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.MouseButton;
-import net.labymod.api.client.render.font.text.TextRenderer;
+import net.labymod.api.client.render.font.ComponentRenderer;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class KeyStrokeConfig {
 
-  private static final TextRenderer TEXT_RENDERER = Laby.labyAPI().renderPipeline().textRenderer();
+  private static final ComponentRenderer TEXT_RENDERER = Laby.labyAPI()
+      .renderPipeline()
+      .componentRenderer();
 
   private Key key;
 
@@ -35,6 +41,7 @@ public class KeyStrokeConfig {
   private float y;
 
   private float width = KeyStrokeGridWidget.DEFAULT_WIDTH;
+  private boolean bigSpace;
 
   private transient boolean pressed;
   private transient long lastPressedUpdate;
@@ -62,8 +69,13 @@ public class KeyStrokeConfig {
   }
 
   public void updateWidth(Key key) {
+    if (this.bigSpace && key == Key.SPACE) {
+      this.width = KeyStrokeGridWidget.DEFAULT_WIDTH * 3 + 4;
+      return;
+    }
+
     int padding = KeyStrokeWidget.PADDING * 2;
-    float actualWidth = TEXT_RENDERER.width(this.getKeyName()) + padding;
+    float actualWidth = TEXT_RENDERER.width(Component.text(this.getKeyName())) + padding;
     float defaultWidth = KeyStrokeGridWidget.DEFAULT_WIDTH;
     if (key == MouseButton.LEFT || key == MouseButton.MIDDLE
         || key == MouseButton.RIGHT) {
@@ -71,6 +83,15 @@ public class KeyStrokeConfig {
     }
 
     this.width = Math.max(actualWidth, defaultWidth);
+  }
+
+  public void updateBigSpace(boolean bigSpace) {
+    if (this.bigSpace == bigSpace || this.key != Key.SPACE) {
+      return;
+    }
+
+    this.bigSpace = bigSpace;
+    this.updateWidth(this.key);
   }
 
   public float getX() {
@@ -119,12 +140,25 @@ public class KeyStrokeConfig {
     return key.getName();
   }
 
+  public float getHeight(KeyStrokesHudWidgetConfig config) {
+    return this.getHeight(config.fancySpace().get());
+  }
+
+  public float getHeight(boolean fancySpace) {
+    if (this.key != Key.SPACE || !fancySpace) {
+      return DEFAULT_HEIGHT;
+    }
+
+    return 14;
+  }
+
   public long getLastPressedUpdate() {
     return this.lastPressedUpdate;
   }
 
   public void enableKeyTracking() {
-    if (this.keyTracker != null) {
+    if (this.keyTracker != null
+        || (this.key != MouseButton.LEFT && this.key != MouseButton.RIGHT)) {
       return;
     }
 

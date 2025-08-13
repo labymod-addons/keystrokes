@@ -19,11 +19,9 @@ package net.labymod.addons.keystrokes.hudwidget;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
-import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
-import net.labymod.api.client.render.matrix.Stack;
 
 public class KeyStrokesWidget extends KeyStrokeGridWidget {
 

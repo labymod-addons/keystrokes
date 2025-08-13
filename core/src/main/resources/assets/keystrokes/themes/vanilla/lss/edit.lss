@@ -36,6 +36,10 @@
       icon: sprite("common", 0, 0, 16);
       color: red;
     }
+
+    .reset-button {
+      alignment: right;
+    }
   }
 }
 

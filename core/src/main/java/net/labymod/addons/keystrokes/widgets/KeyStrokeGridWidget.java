@@ -20,13 +20,13 @@ import java.awt.*;
 import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
-import net.labymod.api.client.gui.mouse.MutableMouse;
 import net.labymod.api.client.gui.screen.Parent;
+import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.key.Key;
+import net.labymod.api.client.gui.screen.state.ScreenCanvas;
+import net.labymod.api.client.gui.screen.state.states.GuiRectangleRenderState.RectConfig;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
-import net.labymod.api.client.render.draw.RectangleRenderer;
-import net.labymod.api.client.render.matrix.Stack;
 import net.labymod.api.util.bounds.ModifyReason;
 import net.labymod.api.util.bounds.Point;
 import net.labymod.api.util.bounds.Rectangle;
@@ -82,16 +82,18 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
     Set<KeyStrokeConfig> keyStrokes = this.config.getKeyStrokes();
     for (KeyStrokeConfig keyStroke : keyStrokes) {
       Key key = keyStroke.key();
+
       if (keyStroke != anchor) {
         keyStroke.updateWidth(key);
 
+        float keyHeight = keyStroke.getHeight(this.config);
         if (adjustBounds) {
           if (keyStroke.getX() >= 0 && width < anchorX + keyStroke.getX() + keyStroke.getWidth()) {
             width = anchorX + keyStroke.getX() + keyStroke.getWidth();
           }
 
-          if (keyStroke.getY() >= 0 && height < anchorY + keyStroke.getY() + DEFAULT_HEIGHT) {
-            height = anchorY + keyStroke.getY() + DEFAULT_HEIGHT;
+          if (keyStroke.getY() >= 0 && height < anchorY + keyStroke.getY() + keyHeight) {
+            height = anchorY + keyStroke.getY() + keyHeight;
           }
         }
 
@@ -107,8 +109,8 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
           this.maxX = keyStroke.getX() + keyStroke.getWidth();
         }
 
-        if (this.maxY < keyStroke.getY() + DEFAULT_HEIGHT) {
-          this.maxY = keyStroke.getY() + DEFAULT_HEIGHT;
+        if (this.maxY < keyStroke.getY() + keyHeight) {
+          this.maxY = keyStroke.getY() + keyHeight;
         }
       }
     }
@@ -144,7 +146,11 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
       }
 
       widgetBounds.setPosition((int) widgetX, (int) widgetY, REASON);
-      widgetBounds.setSize((int) keyStroke.getWidth(), DEFAULT_HEIGHT, REASON);
+      widgetBounds.setSize(
+          (int) keyStroke.getWidth(),
+          (int) keyStroke.getHeight(this.config),
+          REASON
+      );
 
       if (this.reload) {
         if (this.initialized) {
@@ -166,33 +172,40 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
     this.reload = true;
   }
 
-  protected void renderDebug(Stack stack) {
+  protected void renderDebug(ScreenContext context) {
     if (!this.renderDebug()) {
       return;
     }
 
     Bounds bounds = this.bounds();
-    RectangleRenderer rectangleRenderer = this.labyAPI.renderPipeline().rectangleRenderer();
-    rectangleRenderer.renderOutline(stack, bounds, Color.RED.getRGB(), 1);
-    rectangleRenderer
-        .pos(
-            bounds.getX(),
-            bounds.getCenterY() - 0.5F,
-            bounds.getMaxX(),
-            bounds.getCenterY() + 0.5F
-        )
-        .color(Color.RED.getRGB())
-        .render(stack);
 
-    rectangleRenderer.
-        pos(
-            bounds.getCenterX() - 0.5F,
-            bounds.getY(),
-            bounds.getCenterX() + 0.5F,
-            bounds.getMaxY()
-        )
-        .color(Color.RED.getRGB())
-        .render(stack);
+    ScreenCanvas canvas = context.canvas();
+    canvas.submitOutlineRect(
+        bounds,
+        1,
+        0,
+        Color.RED.getRGB()
+    );
+
+    canvas.submitGuiRect(
+        bounds.getX(),
+        bounds.getCenterY() - 0.5F,
+        bounds.getMaxX(),
+        bounds.getCenterY() + 0.5F,
+        RectConfig.builder()
+            .setArgb(Color.RED.getRGB())
+            .build()
+    );
+
+    canvas.submitGuiRect(
+        bounds.getCenterX() - 0.5F,
+        bounds.getY(),
+        bounds.getCenterX() + 0.5F,
+        bounds.getMaxY(),
+        RectConfig.builder()
+            .setArgb(Color.RED.getRGB())
+            .build()
+    );
 
     Key key = this.config.base().get();
     KeyStrokeWidget anchorWidget = this.findFirstChildIf(child -> child.key() == key);
@@ -201,15 +214,21 @@ public class KeyStrokeGridWidget extends AbstractWidget<KeyStrokeWidget> {
     }
 
     KeyStrokeConfig config = anchorWidget.config();
-    rectangleRenderer.renderOutline(stack, anchorWidget.bounds(), Color.YELLOW.getRGB(), 1);
+    canvas.submitOutlineRect(
+        anchorWidget.bounds(),
+        1,
+        0,
+        Color.YELLOW.getRGB()
+    );
 
-    rectangleRenderer
-        .pos(anchorWidget.bounds().getX() - config.getX(),
-            anchorWidget.bounds().getY() - config.getY()
-        )
-        .size(1)
-        .color(Color.YELLOW.getRGB())
-        .render(stack);
+    canvas.submitGuiRect(
+        anchorWidget.bounds().getX() - config.getX(),
+        anchorWidget.bounds().getY() - config.getY(),
+        1, 1,
+        RectConfig.builder()
+            .setArgb(Color.YELLOW.getRGB())
+            .build()
+    );
   }
 
   protected boolean renderDebug() {

@@ -16,14 +16,12 @@
 
 package net.labymod.addons.keystrokes.activities;
 
-import java.util.Set;
-import java.util.function.Consumer;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.api.Laby;
+import net.labymod.api.client.component.Component;
 import net.labymod.api.client.gui.mouse.MutableMouse;
-import net.labymod.api.client.gui.screen.LabyScreen;
 import net.labymod.api.client.gui.screen.Parent;
 import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.activity.Activity;
@@ -37,9 +35,12 @@ import net.labymod.api.client.gui.screen.widget.widgets.DivWidget;
 import net.labymod.api.client.gui.screen.widget.widgets.input.ButtonWidget;
 import net.labymod.api.client.gui.screen.widget.widgets.layout.FlexibleContentWidget;
 import net.labymod.api.client.gui.screen.widget.widgets.layout.list.HorizontalListWidget;
-import net.labymod.api.client.render.matrix.Stack;
+import net.labymod.api.client.gui.screen.widget.widgets.popup.SimpleAdvancedPopup;
+import net.labymod.api.client.gui.screen.widget.widgets.popup.SimpleAdvancedPopup.SimplePopupButton;
 import net.labymod.api.event.Subscribe;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
+import java.util.function.Consumer;
 
 @Link("edit.lss")
 @AutoActivity
@@ -190,6 +191,27 @@ public class KeyStrokeManageActivity extends Activity {
     });
     manageButtonContainer.addEntry(removeButton);
 
+    ButtonWidget resetButton = ButtonWidget.i18n("labymod.ui.button.reset");
+    resetButton.addId("reset-button");
+    resetButton.setPressable(() -> SimpleAdvancedPopup.builder()
+        .title(Component.text("Reset Keystrokes?"))
+        .description(Component.text(
+            "Are you sure you want to reset all keystrokes? This action cannot be undone."))
+        .addButton(SimplePopupButton.cancel())
+        .addButton(SimplePopupButton.confirm(button -> {
+          this.hudWidgetConfig.setDefaultKeyStrokes();
+          this.hudWidgetConfig.refreshCPSTracking();
+          this.hudWidgetConfig.updateSpace(false);
+          this.manageWidget.select(null);
+
+          this.reload();
+          Laby.fireEvent(new KeyStrokeUpdateEvent(false));
+        }))
+        .build()
+        .displayInOverlay());
+
+    manageButtonContainer.addEntry(resetButton);
+
     this.content.addContent(manageButtonContainer);
     this.document.addChild(this.content);
   }
@@ -241,7 +263,8 @@ public class KeyStrokeManageActivity extends Activity {
 
   @Override
   public boolean mouseClicked(MutableMouse mouse, MouseButton mouseButton) {
-    if (this.overlayWidget == null || !this.overlayWidget.isVisible() || this.addCallback == null) {
+    if (this.overlayWidget == null || !this.overlayWidget.isVisible() || this.addCallback == null
+        || mouseButton == MouseButton.NONE) {
       return super.mouseClicked(mouse, mouseButton);
     }
 
@@ -262,7 +285,8 @@ public class KeyStrokeManageActivity extends Activity {
 
   @Override
   public boolean keyPressed(Key key, InputType type) {
-    if (this.overlayWidget == null || !this.overlayWidget.isVisible() || this.addCallback == null) {
+    if (this.overlayWidget == null || !this.overlayWidget.isVisible() || this.addCallback == null
+        || key == Key.NONE) {
       return super.keyPressed(key, type);
     }
 

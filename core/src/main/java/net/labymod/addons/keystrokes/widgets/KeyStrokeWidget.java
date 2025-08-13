@@ -20,14 +20,17 @@ import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.api.Laby;
+import net.labymod.api.client.gfx.pipeline.RenderAttributes;
+import net.labymod.api.client.gfx.pipeline.RenderAttributesStack;
 import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.key.Key;
+import net.labymod.api.client.gui.screen.state.RoundedData;
+import net.labymod.api.client.gui.screen.state.ScreenCanvas;
+import net.labymod.api.client.gui.screen.state.TextFlags;
+import net.labymod.api.client.gui.screen.state.states.GuiRectangleRenderState.RectConfig;
 import net.labymod.api.client.gui.screen.widget.SimpleWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.BoundsType;
-import net.labymod.api.client.render.RenderPipeline;
-import net.labymod.api.client.render.draw.RectangleRenderer;
-import net.labymod.api.client.render.font.text.TextRenderer;
 import net.labymod.api.client.render.matrix.Stack;
 import net.labymod.api.util.Color;
 import net.labymod.api.util.color.format.ColorFormat;
@@ -35,8 +38,6 @@ import net.labymod.api.util.color.format.ColorFormat;
 public class KeyStrokeWidget extends SimpleWidget {
 
   public static final int PADDING = 4;
-  private static final RenderPipeline RENDER_PIPELINE = Laby.labyAPI().renderPipeline();
-  private static final RectangleRenderer RECTANGLE_RENDERER = RENDER_PIPELINE.rectangleRenderer();
 
   private final Key key;
   private final KeyStrokeConfig keyStroke;
@@ -66,30 +67,39 @@ public class KeyStrokeWidget extends SimpleWidget {
           : this.defaultConfig.backgroundColor().get().get();
     }
 
-    RECTANGLE_RENDERER
-        .pos(bounds.rectangle(BoundsType.OUTER))
-        .color(backgroundColor);
+    ScreenCanvas canvas = context.canvas();
 
     int textColor = this.getTextColor();
     boolean roundedCorners = this.defaultConfig.roundedCorners().get();
     boolean outline = this.defaultConfig.outline().get();
-    if (roundedCorners) {
-      RECTANGLE_RENDERER
-          .rounded(5)
-          .upperEdgeSoftness(0.2F);
 
-      if (outline) {
-        RECTANGLE_RENDERER
-            .borderColor(textColor)
-            .borderThickness(1);
-      } else {
-        RECTANGLE_RENDERER
-            .lowerEdgeSoftness(-0.5F);
-      }
+    float borderRadius = 0;
+
+    if (roundedCorners) {
+      Float scale = this.defaultConfig.scale().get();
+      float height = this.bounds().getHeight() * scale;
+      float radius = this.defaultConfig.roundedRadius().get() * scale;
+      borderRadius = Math.min(height / 2, radius);
     }
 
+    int outlineColor = !outline || this.defaultConfig.useTextColorAsOutline().get()
+        ? textColor
+        : this.defaultConfig.outlineColor().get().get();
+
     Stack stack = context.stack();
-    RECTANGLE_RENDERER.render(stack);
+    canvas.submitGuiRect(
+        bounds.rectangle(BoundsType.OUTER),
+        RectConfig.builder()
+            .setArgb(backgroundColor)
+            .setRoundedData(RoundedData.builder()
+                .setRadius(borderRadius)
+                .setUpperEdgeSoftness(0.2F)
+                .setLowerEdgeSoftness(-0.5F)
+                .setBorderColor(outlineColor)
+                .setBorderThickness(outline ? 1 : 0)
+                .build())
+            .build()
+    );
 
     if (renderPressedSeparate) {
       float width = bounds.getWidth() * transitionProgress;
@@ -99,70 +109,74 @@ public class KeyStrokeWidget extends SimpleWidget {
       float y = bounds.getY() + (bounds.getHeight() - height) / 2;
       Color color = this.defaultConfig.pressedColor().get();
 
-      RECTANGLE_RENDERER
-          .pos(x, y)
-          .size(width, height)
-          .color(ColorFormat.ARGB32.pack(color.get(), (int) (color.getAlpha() * transitionProgress)));
-
-      if (roundedCorners) {
-        RECTANGLE_RENDERER
-            .rounded(5)
-            .upperEdgeSoftness(0.2F)
-            .lowerEdgeSoftness(-0.5F);
-      }
-
-      RECTANGLE_RENDERER.render(stack);
+      canvas.submitGuiRect(
+          x, y, width, height,
+          RectConfig.builder()
+              .setArgb(ColorFormat.ARGB32.pack(
+                  color.get(),
+                  (int) (color.getAlpha() * transitionProgress)
+              ))
+              .setRoundedData(RoundedData.builder()
+                  .setRadius(roundedCorners ? borderRadius : 0)
+                  .setUpperEdgeSoftness(0.2F)
+                  .setLowerEdgeSoftness(-0.5F)
+                  .setBorderColor(outlineColor)
+                  .setBorderThickness(outline ? 1 : 0)
+                  .build())
+              .build()
+      );
     }
 
-    if (!roundedCorners && outline) {
-      RECTANGLE_RENDERER
-          .renderOutline(
-              stack,
-              bounds.getX() + 1,
-              bounds.getY() + 1,
-              bounds.getMaxX() - 1,
-              bounds.getMaxY() - 1,
-              textColor,
-              1
-          );
+    if (this.key == Key.SPACE && this.defaultConfig.fancySpace().get()) {
+      float spaceWidth = bounds.getWidth() / 2 / 2;
+      RenderAttributesStack renderAttributesStack = Laby.references()
+          .renderEnvironmentContext()
+          .renderAttributesStack();
+      RenderAttributes attributes = renderAttributesStack.last();
+      canvas.submitGuiRect(
+          bounds.getCenterX() - spaceWidth,
+          bounds.getY() + 5,
+          spaceWidth * 2,
+          attributes.isForceVanillaFont() ? 1.0F : 1.5F,
+          RectConfig.builder()
+              .setArgb(textColor)
+              .setRoundedData(RoundedData.builder()
+                  .setRadius(attributes.isForceVanillaFont() ? 0 : 1f)
+                  .setUpperEdgeSoftness(0.2F)
+                  .setLowerEdgeSoftness(-0.5F)
+                  .build())
+              .build()
+      );
+      return;
     }
 
-    TextRenderer textRenderer = RENDER_PIPELINE.textRenderer();
     KeyTracker keyTracker = this.keyStroke.getKeyTracker();
-    float fontHeight = textRenderer.height();
-    float y = bounds.getCenterY() - (textRenderer.height() / 2) + 0.8F;
+    float fontHeight = canvas.getLineHeight();
+    float y = bounds.getCenterY() - (fontHeight / 2) + 0.8F;
     if (keyTracker != null) {
       y -= fontHeight * 0.25F;
     }
 
     float x = bounds.getCenterX() + 0.4F;
-    textRenderer
-        .pos(
-            x,
-            y
-        )
-        .useFloatingPointPosition(true)
-        .color(textColor)
-        .shadow(true)
-        .centered(true)
-        .text(this.keyStroke.getKeyName())
-        .render(stack);
+    canvas.submitText(
+        this.keyStroke.getKeyName(),
+        x, y,
+        textColor,
+        1.0F,
+        TextFlags.SHADOW | TextFlags.CENTERED | TextFlags.USE_FLOATING_POINT_VALUES
+    );
 
     if (keyTracker != null) {
       stack.push();
       stack.translate(x, y, 0);
       stack.scale(0.5F);
-      textRenderer
-          .pos(
-              0,
-              fontHeight * 1.5F + 3
-          )
-          .useFloatingPointPosition(true)
-          .color(textColor)
-          .shadow(true)
-          .centered(true)
-          .text(keyTracker.getCount() + " CPS")
-          .render(stack);
+      canvas.submitText(
+          keyTracker.getCount() + " CPS",
+          0, fontHeight * 1.5F + 3,
+          textColor,
+          1.0F,
+          TextFlags.SHADOW | TextFlags.CENTERED | TextFlags.USE_FLOATING_POINT_VALUES
+      );
       stack.pop();
     }
   }

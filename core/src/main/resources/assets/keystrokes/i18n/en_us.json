@@ -40,11 +40,28 @@
         "outline": {
           "name": "Outline"
         },
+        "useTextColorAsOutline": {
+          "name": "Use Text Color as Outline Color"
+        },
+        "outlineColor": {
+          "name": "Outline Color"
+        },
         "roundedCorners": {
           "name": "Rounded Corners"
         },
+        "roundedRadius": {
+          "name": "Rounded Radius"
+        },
         "transition": {
           "name": "Transition"
+        },
+        "fancySpace": {
+          "name": "Fancy Space",
+          "description": "Replaces the \"SPACE\" text with a space character"
+        },
+        "bigSpace": {
+          "name": "Big Space",
+          "description": "Makes the space key bigger, giving it the width of three keys"
         },
         "trackMouseCPS": {
           "name": "Track Mouse CPS"

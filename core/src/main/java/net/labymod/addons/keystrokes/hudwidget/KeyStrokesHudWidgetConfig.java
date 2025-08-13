@@ -16,10 +16,6 @@
 
 package net.labymod.addons.keystrokes.hudwidget;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.activities.KeyStrokeManageActivity;
 import net.labymod.api.Laby;
@@ -27,20 +23,19 @@ import net.labymod.api.client.gui.hud.hudwidget.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.MouseButton;
-import net.labymod.api.client.gui.screen.widget.widgets.activity.settings.AddonActivityWidget.AddonActivitySetting;
+import net.labymod.api.client.gui.screen.widget.widgets.activity.settings.ActivitySettingWidget.ActivitySetting;
+import net.labymod.api.client.gui.screen.widget.widgets.input.SliderWidget.SliderSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.SwitchWidget.SwitchSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.color.ColorPickerWidget.ColorPickerSetting;
 import net.labymod.api.configuration.loader.property.ConfigProperty;
+import net.labymod.api.configuration.settings.annotation.SettingRequires;
 import net.labymod.api.util.Color;
 import net.labymod.api.util.MethodOrder;
 
-@SuppressWarnings("FieldMayBeFinal")
-public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
+import java.util.HashSet;
+import java.util.Set;
 
-  @ColorPickerSetting(chroma = true, alpha = true)
-  private final ConfigProperty<Color> pressedColor = new ConfigProperty<>(
-      Color.ofRGB(255, 255, 255, 104)
-  );
+public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   @ColorPickerSetting(chroma = true, alpha = true)
   private final ConfigProperty<Color> textColor = new ConfigProperty<>(
@@ -52,20 +47,45 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
       Color.ofRGB(0, 0, 0, 155)
   );
 
+  @ColorPickerSetting(chroma = true, alpha = true)
+  private final ConfigProperty<Color> pressedColor = new ConfigProperty<>(
+      Color.ofRGB(255, 255, 255, 104)
+  );
+
   @SwitchSetting
   private final ConfigProperty<Boolean> outline = new ConfigProperty<>(false);
+
+  @SwitchSetting
+  @SettingRequires("outline")
+  private final ConfigProperty<Boolean> useTextColorAsOutline = new ConfigProperty<>(true);
+
+  @ColorPickerSetting(chroma = true, alpha = true)
+  @SettingRequires(value = "useTextColorAsOutline", invert = true)
+  private final ConfigProperty<Color> outlineColor = new ConfigProperty<>(
+      Color.ofRGB(255, 255, 255, 255)
+  );
 
   @SwitchSetting
   private final ConfigProperty<Boolean> roundedCorners = new ConfigProperty<>(
       Laby.labyAPI().themeService().currentTheme().getId().equals("fancy")
   );
 
+  @SliderSetting(min = 1, max = 10, steps = 1)
+  @SettingRequires("roundedCorners")
+  private final ConfigProperty<Integer> roundedRadius = new ConfigProperty<>(5);
+
   @SwitchSetting
   private final ConfigProperty<Boolean> transition = new ConfigProperty<>(true);
 
-  public ConfigProperty<Boolean> trackMouseCPS() {
-    return this.trackMouseCPS;
-  }  @SwitchSetting
+  @SwitchSetting
+  private final ConfigProperty<Boolean> fancySpace = new ConfigProperty<>(true)
+      .addChangeListener(this::updateFancySpace);
+
+  @SwitchSetting
+  private final ConfigProperty<Boolean> bigSpace = new ConfigProperty<>(false)
+      .addChangeListener(bigSpace -> this.updateSpace(true));
+
+  @SwitchSetting
   private final ConfigProperty<Boolean> trackMouseCPS = new ConfigProperty<>(true)
       .addChangeListener((property, oldValue, newValue) -> this.refreshCPSTracking());
 
@@ -74,14 +94,12 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
   private final ConfigProperty<Key> base = new ConfigProperty<>(Key.S);
 
-  private transient List<KeyStrokesWidget> widget = new ArrayList<>();
-
   public Set<KeyStrokeConfig> getKeyStrokes() {
     return this.keyStrokes.get();
   }
 
   @MethodOrder(before = "pressedColor")
-  @AddonActivitySetting
+  @ActivitySetting
   public Activity edit() {
     return new KeyStrokeManageActivity(this);
   }
@@ -102,12 +120,36 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     return this.outline;
   }
 
+  public ConfigProperty<Boolean> useTextColorAsOutline() {
+    return this.useTextColorAsOutline;
+  }
+
+  public ConfigProperty<Color> outlineColor() {
+    return this.outlineColor;
+  }
+
   public ConfigProperty<Boolean> roundedCorners() {
     return this.roundedCorners;
   }
 
+  public ConfigProperty<Integer> roundedRadius() {
+    return this.roundedRadius;
+  }
+
   public ConfigProperty<Boolean> transition() {
     return this.transition;
+  }
+
+  public ConfigProperty<Boolean> fancySpace() {
+    return this.fancySpace;
+  }
+
+  public ConfigProperty<Boolean> bigSpace() {
+    return this.bigSpace;
+  }
+
+  public ConfigProperty<Boolean> trackMouseCPS() {
+    return this.trackMouseCPS;
   }
 
   public void setDefaultKeyStrokes() {
@@ -116,13 +158,23 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
     keyStrokes.add(new KeyStrokeConfig(Key.A, -22, 0));
     keyStrokes.add(new KeyStrokeConfig(Key.S, 22, 22));
     keyStrokes.add(new KeyStrokeConfig(Key.D, 22, 0));
-    keyStrokes.add(new KeyStrokeConfig(MouseButton.LEFT, -22, 22));
-    keyStrokes.add(new KeyStrokeConfig(MouseButton.RIGHT, 11, 22));
-    if (this.anchorConfig() == null) {
+    KeyStrokeConfig spaceConfig = new KeyStrokeConfig(Key.SPACE, -22, 22);
+    keyStrokes.add(spaceConfig);
+    keyStrokes.add(new KeyStrokeConfig(MouseButton.LEFT, -22, 44));
+    keyStrokes.add(new KeyStrokeConfig(MouseButton.RIGHT, 11, 44));
+    if (this.base.get() != Key.S) {
       this.base.reset();
     }
 
+    if (!this.bigSpace.get()) {
+      spaceConfig.updateWidth(spaceConfig.key());
+      spaceConfig.updatePosition(10 - spaceConfig.getWidth() / 2, spaceConfig.getY());
+    }
+
     this.keyStrokes.set(keyStrokes);
+    if (this.fancySpace.get()) {
+      this.updateFancySpace(this.fancySpace.get());
+    }
   }
 
   public KeyStrokeConfig anchorConfig() {
@@ -159,11 +211,6 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   public void refreshCPSTracking() {
     boolean tracking = this.trackMouseCPS.get();
     for (KeyStrokeConfig keyStrokeConfig : this.keyStrokes.get()) {
-      Key key = keyStrokeConfig.key();
-      if (key != MouseButton.LEFT && key != MouseButton.RIGHT) {
-        continue;
-      }
-
       if (tracking) {
         keyStrokeConfig.enableKeyTracking();
       } else {
@@ -171,6 +218,69 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
       }
     }
   }
+
+  public void updateSpace(boolean actuallyUpdate) {
+    for (KeyStrokeConfig keyStrokeConfig : this.keyStrokes.get()) {
+      if (keyStrokeConfig.key() != Key.SPACE) {
+        continue;
+      }
+
+      if(!actuallyUpdate) {
+        keyStrokeConfig.updateBigSpace(this.bigSpace.get());
+      } else {
+        // update position to center the space key based on the previous width
+        final float prevWidth = keyStrokeConfig.getWidth();
+        keyStrokeConfig.updateBigSpace(this.bigSpace.get());
+        final float newWidth = keyStrokeConfig.getWidth();
+
+        float centerX = keyStrokeConfig.getX() + prevWidth / 2;
+        float targetX = centerX - newWidth / 2;
+        keyStrokeConfig.updatePosition(targetX, keyStrokeConfig.getY());
+      }
+      }
+
+  }
+
+  public void updateFancySpace(boolean fancy) {
+    KeyStrokeConfig space = this.getKeyStroke(Key.SPACE);
+    if (space == null) {
+      return;
+    }
+
+    float prevHeight = space.getHeight(!fancy);
+    float newHeight = space.getHeight(fancy);
+
+    final float bigHeight = fancy ? prevHeight : newHeight;
+    final float smallHeight = fancy ? newHeight : prevHeight;
+
+    float targetY = space.getY() + 4 + bigHeight;
+    float targetMaxX = space.getX() + space.getWidth();
+
+    Key base = this.base().get();
+    // shift up/down all keys intersecting with the space key to adjust for the new space key height
+    for (KeyStrokeConfig keyStrokeConfig : this.keyStrokes.get()) {
+      final float y = keyStrokeConfig.getY();
+      if (keyStrokeConfig.key() == base || keyStrokeConfig.key() == Key.SPACE || y < space.getY()) {
+        continue;
+      }
+
+      final float x = keyStrokeConfig.getX();
+      final float maxX = x + keyStrokeConfig.getWidth();
+      boolean inWidth = (x >= space.getX() && x <= targetMaxX)
+          || (maxX >= space.getX() && maxX <= targetMaxX);
+      if (y < targetY && inWidth) {
+        if (fancy) {
+          keyStrokeConfig.updatePosition(x, y - bigHeight + smallHeight);
+        } else {
+          keyStrokeConfig.updatePosition(x, y - smallHeight + bigHeight);
+        }
+      }
+    }
+  }
+
+
+
+
 
 
 }
