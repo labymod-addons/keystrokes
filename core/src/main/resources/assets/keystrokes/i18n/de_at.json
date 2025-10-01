@@ -1,0 +1,72 @@
+{
+    "keystrokes": {
+        "settings": {
+            "name": "",
+            "enabled": {
+                "name": ""
+            }
+        },
+        "activity": {
+            "edit": {
+                "add": {
+                    "text": "",
+                    "title": "",
+                    "exit": ""
+                },
+                "remove": {
+                    "text": ""
+                },
+                "docking": {
+                    "disable": "",
+                    "disabled": ""
+                }
+            }
+        },
+        "hudWidget": {
+            "keyStrokes": {
+                "name": "",
+                "edit": {
+                    "name": ""
+                },
+                "pressedColor": {
+                    "name": ""
+                },
+                "textColor": {
+                    "name": ""
+                },
+                "backgroundColor": {
+                    "name": ""
+                },
+                "outline": {
+                    "name": ""
+                },
+                "useTextColorAsOutline": {
+                    "name": ""
+                },
+                "outlineColor": {
+                    "name": ""
+                },
+                "roundedCorners": {
+                    "name": ""
+                },
+                "roundedRadius": {
+                    "name": ""
+                },
+                "transition": {
+                    "name": ""
+                },
+                "fancySpace": {
+                    "name": "",
+                    "description": ""
+                },
+                "bigSpace": {
+                    "name": "",
+                    "description": ""
+                },
+                "trackMouseCPS": {
+                    "name": ""
+                }
+            }
+        }
+    }
+}
