@@ -1,1 +1,30 @@
-{}
+{
+    "keystrokes": {
+        "settings": {
+            "name": "Tastetryk",
+            "enabled": {
+                "name": "Aktiveret"
+            }
+        },
+        "activity": {
+            "edit": {
+                "add": {
+                    "exit": "Tryk ESCAPE for at annullere!"
+                },
+                "remove": {
+                    "text": "Fjern tast"
+                }
+            }
+        },
+        "hudWidget": {
+            "keyStrokes": {
+                "textColor": {
+                    "name": "Tekst Farve"
+                },
+                "backgroundColor": {
+                    "name": "Baggrundsfarve"
+                }
+            }
+        }
+    }
+}
