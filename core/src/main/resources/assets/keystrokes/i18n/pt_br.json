@@ -3,7 +3,8 @@
         "activity": {
             "edit": {
                 "add": {
-                    "text": "Adicionar Tecla"
+                    "text": "Adicionar Tecla",
+                    "exit": "Pressione ESC para cancelar!"
                 }
             }
         }
