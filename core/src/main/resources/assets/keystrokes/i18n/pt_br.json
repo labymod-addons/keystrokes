@@ -4,7 +4,8 @@
             "edit": {
                 "add": {
                     "text": "Adicionar Tecla",
-                    "exit": "Pressione ESC para cancelar!"
+                    "exit": "Pressione ESC para cancelar!",
+                    "title": "Pressione qualquer tecla que você deseja adicionar..."
                 },
                 "remove": {
                     "text": "Remover Tecla"
