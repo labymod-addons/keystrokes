@@ -1,1 +1,11 @@
-{}
+{
+    "keystrokes": {
+        "activity": {
+            "edit": {
+                "add": {
+                    "text": "Adicionar Tecla"
+                }
+            }
+        }
+    }
+}
