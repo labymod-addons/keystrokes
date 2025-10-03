@@ -5,6 +5,9 @@
                 "add": {
                     "text": "Adicionar Tecla",
                     "exit": "Pressione ESC para cancelar!"
+                },
+                "remove": {
+                    "text": "Remover Tecla"
                 }
             }
         },
@@ -13,6 +16,11 @@
                 "textColor": {
                     "name": "Cor do Texto"
                 }
+            }
+        },
+        "settings": {
+            "enabled": {
+                "name": "Ativado"
             }
         }
     }
