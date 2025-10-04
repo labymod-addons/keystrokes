@@ -14,7 +14,11 @@
                     "exit": "İptal etmek için ESCAPE tuşuna basın!"
                 },
                 "docking": {
-                    "disabled": "Yerleştirme devre dışı"
+                    "disabled": "Yerleştirme devre dışı",
+                    "disable": "Docking’i inaktif yapmak için CTRL tuşuna basılı tutun"
+                },
+                "remove": {
+                    "text": "Tuşu Kaldır"
                 }
             }
         },
