@@ -52,6 +52,15 @@
                 },
                 "bigSpace": {
                     "name": "Büyük Boşluk"
+                },
+                "pressedColor": {
+                    "name": "Basıldığındaki Renk"
+                },
+                "textColor": {
+                    "name": "Metin rengi"
+                },
+                "backgroundColor": {
+                    "name": "Arka Plan Rengi"
                 }
             }
         }
