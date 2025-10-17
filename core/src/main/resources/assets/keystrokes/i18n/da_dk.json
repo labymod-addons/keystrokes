@@ -9,7 +9,8 @@
         "activity": {
             "edit": {
                 "add": {
-                    "exit": "Tryk ESCAPE for at annullere!"
+                    "exit": "Tryk ESCAPE for at annullere!",
+                    "text": "Tilføj tast"
                 },
                 "remove": {
                     "text": "Fjern Tast"
