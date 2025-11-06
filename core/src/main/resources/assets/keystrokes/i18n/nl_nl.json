@@ -1,1 +1,25 @@
-{}
+{
+    "keystrokes": {
+        "settings": {
+            "name": "Toetsaanslagen",
+            "enabled": {
+                "name": "Ingeschakeld"
+            }
+        },
+        "activity": {
+            "edit": {
+                "add": {
+                    "text": "Toets toevoegen",
+                    "title": "Druk op een toets die je wilt toevoegen…",
+                    "exit": "Druk op ESCAPE om te annuleren!"
+                },
+                "remove": {
+                    "text": "Toets verwijderen"
+                },
+                "docking": {
+                    "disable": "Houd CTRL ingedrukt om vastzetten uit te schakelen"
+                }
+            }
+        }
+    }
+}
