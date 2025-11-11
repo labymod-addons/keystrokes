@@ -10,7 +10,8 @@
             "edit": {
                 "add": {
                     "exit": "Tryk ESCAPE for at annullere!",
-                    "text": "Tilføj tast"
+                    "text": "Tilføj tast",
+                    "title": "Tryk på den tast, du vil tilføje..."
                 },
                 "remove": {
                     "text": "Fjern Tast"
@@ -24,6 +25,9 @@
                 },
                 "backgroundColor": {
                     "name": "Baggrundsfarve"
+                },
+                "roundedCorners": {
+                    "name": "Rundede hjørner"
                 }
             }
         }
