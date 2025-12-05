@@ -35,6 +35,12 @@
                 },
                 "roundedCorners": {
                     "name": "Yuvarlatılmış Köşeler"
+                },
+                "roundedRadius": {
+                    "name": "Yuvarlatılmış yarıçap"
+                },
+                "transition": {
+                    "name": "Geçiş"
                 }
             }
         }
