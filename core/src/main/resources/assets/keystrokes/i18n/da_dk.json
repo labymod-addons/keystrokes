@@ -28,6 +28,10 @@
                 },
                 "roundedCorners": {
                     "name": "Rundede hjørner"
+                },
+                "name": "KeyStrokes",
+                "fancySpace": {
+                    "description": "Erstatter teksten 'SPACE' med et mellemrumstegn"
                 }
             }
         }
