@@ -26,6 +26,15 @@
                 },
                 "outline": {
                     "name": "Kenar Çizgisi"
+                },
+                "useTextColorAsOutline": {
+                    "name": "Metin Rengini Kenar çizgisi Rengi Olarak Kullan"
+                },
+                "outlineColor": {
+                    "name": "Kenar Çizgisi Rengi"
+                },
+                "roundedCorners": {
+                    "name": "Yuvarlatılmış Köşeler"
                 }
             }
         }
