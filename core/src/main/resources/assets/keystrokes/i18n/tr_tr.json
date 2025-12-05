@@ -14,7 +14,7 @@
                     "exit": "İptal etmek için ESCAPE tuşuna basın!"
                 },
                 "docking": {
-                    "disabled": "Yerleştirme devre dışı",
+                    "disabled": "Yerleştirme inaktif",
                     "disable": "Yerleştirmeyi inaktif yapmak için CTRL tuşunu basılı tutun"
                 },
                 "remove": {
@@ -51,7 +51,8 @@
                     "description": "\"SPACE\" metnini bir boşluk karakteriyle değiştirir"
                 },
                 "bigSpace": {
-                    "name": "Büyük Boşluk"
+                    "name": "Büyük Boşluk",
+                    "description": "Boşluk tuşunu büyütür ve üç tuşun genişliğini verir"
                 },
                 "pressedColor": {
                     "name": "Basıldığındaki Renk"
@@ -61,6 +62,9 @@
                 },
                 "backgroundColor": {
                     "name": "Arka Plan Rengi"
+                },
+                "trackMouseCPS": {
+                    "name": "Fare CPS'sini Takip Etme"
                 }
             }
         }
