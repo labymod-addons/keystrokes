@@ -15,7 +15,7 @@
                 },
                 "docking": {
                     "disabled": "Yerleştirme devre dışı",
-                    "disable": "Docking’i inaktif yapmak için CTRL tuşuna basılı tutun"
+                    "disable": "Yerleştirmeyi inaktif yapmak için CTRL tuşunu basılı tutun"
                 },
                 "remove": {
                     "text": "Tuşu Kaldır"
@@ -45,6 +45,13 @@
                 },
                 "transition": {
                     "name": "Geçiş"
+                },
+                "fancySpace": {
+                    "name": "Süslü Boşluk",
+                    "description": "\"SPACE\" metnini bir boşluk karakteriyle değiştirir"
+                },
+                "bigSpace": {
+                    "name": "Büyük Boşluk"
                 }
             }
         }
