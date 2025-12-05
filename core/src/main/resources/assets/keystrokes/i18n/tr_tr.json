@@ -23,6 +23,9 @@
                 "name": "Tuş Basışları",
                 "edit": {
                     "name": "Düzeni Düzenle"
+                },
+                "outline": {
+                    "name": "Kenar Çizgisi"
                 }
             }
         }
