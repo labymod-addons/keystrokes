@@ -12,6 +12,17 @@
                     "text": "Tuş Ekle",
                     "title": "Eklemek istediğiniz herhangi bir tuşa basın...",
                     "exit": "İptal etmek için ESCAPE tuşuna basın!"
+                },
+                "docking": {
+                    "disabled": "Yerleştirme devre dışı"
+                }
+            }
+        },
+        "hudWidget": {
+            "keyStrokes": {
+                "name": "Tuş Basışları",
+                "edit": {
+                    "name": "Düzeni Düzenle"
                 }
             }
         }
