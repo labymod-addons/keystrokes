@@ -1,1 +1,72 @@
-{}
+{
+    "keystrokes": {
+        "settings": {
+            "name": "KeyStrokes",
+            "enabled": {
+                "name": "Включено"
+            }
+        },
+        "activity": {
+            "edit": {
+                "add": {
+                    "text": "Добавить клавишу",
+                    "title": "Нажмите клавишу для добавления...",
+                    "exit": "Для отмены нажмите ESCAPE"
+                },
+                "remove": {
+                    "text": "Удалить клавишу"
+                },
+                "docking": {
+                    "disable": "Зажмите CTRL, чтобы отключить стыковку",
+                    "disabled": "Стыковка отключена"
+                }
+            }
+        },
+        "hudWidget": {
+            "keyStrokes": {
+                "name": "KeyStrokes",
+                "edit": {
+                    "name": "Изменить раскладку"
+                },
+                "pressedColor": {
+                    "name": "Цвет при нажатии"
+                },
+                "textColor": {
+                    "name": "Цвет текста"
+                },
+                "backgroundColor": {
+                    "name": "Цвет фона"
+                },
+                "outline": {
+                    "name": "Обводка"
+                },
+                "useTextColorAsOutline": {
+                    "name": "Использовать цвет текста для обводки"
+                },
+                "outlineColor": {
+                    "name": "Цвет обводки"
+                },
+                "roundedCorners": {
+                    "name": "Закруглённые углы"
+                },
+                "roundedRadius": {
+                    "name": "Радиус закругления"
+                },
+                "transition": {
+                    "name": "Анимация нажатия"
+                },
+                "fancySpace": {
+                    "name": "Особый стиль пробела",
+                    "description": "Заменяет слово «Пробел» на символ пробела."
+                },
+                "bigSpace": {
+                    "name": "Длинный пробел",
+                    "description": "Делает клавишу пробела длиной в три клавиши."
+                },
+                "trackMouseCPS": {
+                    "name": "Отслеживать CPS мыши"
+                }
+            }
+        }
+    }
+}
