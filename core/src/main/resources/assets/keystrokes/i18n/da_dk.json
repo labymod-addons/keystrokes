@@ -15,6 +15,10 @@
                 },
                 "remove": {
                     "text": "Fjern Tast"
+                },
+                "docking": {
+                    "disable": "Hold CTRL nede for at deaktivere dokning",
+                    "disabled": "Dokning deaktiveret"
                 }
             }
         },
