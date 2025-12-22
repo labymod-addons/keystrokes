@@ -42,6 +42,15 @@
                 },
                 "fancySpace": {
                     "name": "Fancy Space"
+                },
+                "useTextColorAsOutline": {
+                    "name": "Gebruik Tekst Kleur Als Uitlijn Kleur"
+                },
+                "outlineColor": {
+                    "name": "Omtrekkleur"
+                },
+                "roundedCorners": {
+                    "name": "Afgeronde Hoeken"
                 }
             }
         }
