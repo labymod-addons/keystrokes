@@ -54,13 +54,17 @@
                     "name": "Overgang"
                 },
                 "bigSpace": {
-                    "description": "Gør mellemrumstasten større, så den får bredden af tre taster"
+                    "description": "Gør mellemrumstasten større, så den får bredden af tre taster",
+                    "name": "Stor Mellemrum"
                 },
                 "pressedColor": {
                     "name": "Farve når trykket"
                 },
                 "roundedRadius": {
                     "name": "Afrundet Radius"
+                },
+                "trackMouseCPS": {
+                    "name": "Spor Mus CPS"
                 }
             }
         }
