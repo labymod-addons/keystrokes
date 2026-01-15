@@ -39,6 +39,15 @@
                 },
                 "edit": {
                     "name": "Ændr Opsætning"
+                },
+                "outline": {
+                    "name": "Omrids"
+                },
+                "useTextColorAsOutline": {
+                    "name": "Brug tekstfarve som omridsfarve"
+                },
+                "outlineColor": {
+                    "name": "Omridsfarve"
                 }
             }
         }
