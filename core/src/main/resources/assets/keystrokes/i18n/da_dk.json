@@ -54,6 +54,9 @@
                 },
                 "bigSpace": {
                     "description": "Gør mellemrumstasten større, så den får bredden af tre taster"
+                },
+                "pressedColor": {
+                    "name": "Farve når trykket"
                 }
             }
         }
