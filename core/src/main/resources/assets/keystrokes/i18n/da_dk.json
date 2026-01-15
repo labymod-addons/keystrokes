@@ -36,6 +36,9 @@
                 "name": "KeyStrokes",
                 "fancySpace": {
                     "description": "Erstatter teksten 'SPACE' med et mellemrumstegn"
+                },
+                "edit": {
+                    "name": "Ændr Opsætning"
                 }
             }
         }
