@@ -35,7 +35,8 @@
                 },
                 "name": "KeyStrokes",
                 "fancySpace": {
-                    "description": "Erstatter teksten 'SPACE' med et mellemrumstegn"
+                    "description": "Erstatter teksten 'SPACE' med et mellemrumstegn",
+                    "name": "Smart Mellemrum"
                 },
                 "edit": {
                     "name": "Ændr Opsætning"
@@ -57,6 +58,9 @@
                 },
                 "pressedColor": {
                     "name": "Farve når trykket"
+                },
+                "roundedRadius": {
+                    "name": "Afrundet Radius"
                 }
             }
         }
