@@ -48,6 +48,9 @@
                 },
                 "outlineColor": {
                     "name": "Omridsfarve"
+                },
+                "transition": {
+                    "name": "Overgang"
                 }
             }
         }
