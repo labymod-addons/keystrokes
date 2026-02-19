@@ -7,6 +7,13 @@
                     "exit": "Pressione ESC para cancelar!"
                 }
             }
+        },
+        "hudWidget": {
+            "keyStrokes": {
+                "textColor": {
+                    "name": "Cor do Texto"
+                }
+            }
         }
     }
 }
