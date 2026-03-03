@@ -51,6 +51,9 @@
                 },
                 "transition": {
                     "name": "Overgang"
+                },
+                "bigSpace": {
+                    "description": "Gør mellemrumstasten større, så den får bredden af tre taster"
                 }
             }
         }
