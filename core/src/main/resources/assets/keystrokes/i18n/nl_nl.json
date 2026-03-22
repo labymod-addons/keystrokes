@@ -41,7 +41,8 @@
                     "name": "Omlijning"
                 },
                 "fancySpace": {
-                    "name": "Fancy Space"
+                    "name": "Fancy Space",
+                    "description": "Vervangt de \"SPACE\"-tekst door een spatiekarakter"
                 },
                 "useTextColorAsOutline": {
                     "name": "Gebruik Tekst Kleur Als Uitlijn Kleur"
@@ -51,6 +52,19 @@
                 },
                 "roundedCorners": {
                     "name": "Afgeronde Hoeken"
+                },
+                "roundedRadius": {
+                    "name": "Afgeronde radius"
+                },
+                "transition": {
+                    "name": "Overgang"
+                },
+                "bigSpace": {
+                    "name": "Grote spatie",
+                    "description": "Maakt de spatiebalk groter, met de breedte van drie toetsen"
+                },
+                "trackMouseCPS": {
+                    "name": "Muis CPS bijhouden"
                 }
             }
         }
