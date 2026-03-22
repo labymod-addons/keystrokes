@@ -17,7 +17,31 @@
                     "text": "Toets verwijderen"
                 },
                 "docking": {
-                    "disable": "Houd CTRL ingedrukt om vastzetten uit te schakelen"
+                    "disable": "Houd CTRL ingedrukt om vastzetten uit te schakelen",
+                    "disabled": "Docking uitgeschakeld"
+                }
+            }
+        },
+        "hudWidget": {
+            "keyStrokes": {
+                "name": "Toetsaanslagen",
+                "edit": {
+                    "name": "Opmaak bewerken"
+                },
+                "pressedColor": {
+                    "name": "Kleur bij indrukken"
+                },
+                "textColor": {
+                    "name": "Tekstkleur"
+                },
+                "backgroundColor": {
+                    "name": "Achtergrondkleur"
+                },
+                "outline": {
+                    "name": "Omlijning"
+                },
+                "fancySpace": {
+                    "name": "Fancy Space"
                 }
             }
         }
