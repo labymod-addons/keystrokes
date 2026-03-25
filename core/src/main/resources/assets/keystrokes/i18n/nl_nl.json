@@ -24,7 +24,7 @@
         },
         "hudWidget": {
             "keyStrokes": {
-                "name": "Toetsaanslagen",
+                "name": "KeyStrokes",
                 "edit": {
                     "name": "Opmaak bewerken"
                 },
