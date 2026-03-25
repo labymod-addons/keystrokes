@@ -60,7 +60,7 @@
                     "name": "Overgang"
                 },
                 "bigSpace": {
-                    "name": "Grote spatie",
+                    "name": "Grote ruimte",
                     "description": "Maakt de spatiebalk groter, met de breedte van drie toetsen"
                 },
                 "trackMouseCPS": {
