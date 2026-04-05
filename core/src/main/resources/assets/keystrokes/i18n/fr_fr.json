@@ -1,1 +1,10 @@
-{}
+{
+    "keystrokes": {
+        "settings": {
+            "name": "Touches enfoncées",
+            "enabled": {
+                "name": "Activé"
+            }
+        }
+    }
+}
