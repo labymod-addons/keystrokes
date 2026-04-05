@@ -5,6 +5,14 @@
             "enabled": {
                 "name": "Activé"
             }
+        },
+        "activity": {
+            "edit": {
+                "add": {
+                    "text": "Ajouter une touche",
+                    "title": "Appuyez sur la touche que vous souhaitez ajouter..."
+                }
+            }
         }
     }
 }
