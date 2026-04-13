@@ -1,7 +1,17 @@
 {
     "keystrokes": {
         "settings": {
-            "name": "ضغطات المفاتيح"
+            "name": "ضغطات المفاتيح",
+            "enabled": {
+                "name": "مفعّل"
+            }
+        },
+        "activity": {
+            "edit": {
+                "add": {
+                    "text": "إضافة مفتاح"
+                }
+            }
         }
     }
 }
