@@ -66,6 +66,91 @@
         "trackMouseCPS": {
           "name": "Track Mouse CPS"
         }
+      },
+      "mouseTracker": {
+        "name": "Mouse Movement",
+        "header": {
+          "motion": {
+            "name": "Movement"
+          },
+          "appearance": {
+            "name": "Appearance"
+          },
+          "clicks": {
+            "name": "Clicks"
+          }
+        },
+        "sensitivity": {
+          "name": "Sensitivity",
+          "description": "How far the dot moves when you turn. Higher values make small movements easier to see."
+        },
+        "returnTime": {
+          "name": "Return Time (ms)",
+          "description": "How long the dot takes to get halfway back to the center once you stop moving."
+        },
+        "padShape": {
+          "name": "Shape",
+          "description": "Shape of the area the dot moves in.",
+          "entries": {
+            "square": "Square",
+            "circle": "Circle"
+          }
+        },
+        "size": {
+          "name": "Pad Size",
+          "description": "Width and height of the area the dot moves in."
+        },
+        "dotSize": {
+          "name": "Dot Size",
+          "description": "Diameter of the dot."
+        },
+        "dotColor": {
+          "name": "Dot Color"
+        },
+        "backgroundColor": {
+          "name": "Background Color"
+        },
+        "outline": {
+          "name": "Outline"
+        },
+        "outlineColor": {
+          "name": "Outline Color"
+        },
+        "roundedCorners": {
+          "name": "Rounded Corners"
+        },
+        "roundedRadius": {
+          "name": "Rounded Radius"
+        },
+        "showCenterCross": {
+          "name": "Center Lines",
+          "description": "Draw a horizontal and a vertical line through the center."
+        },
+        "guideColor": {
+          "name": "Line Color"
+        },
+        "showTrail": {
+          "name": "Trail",
+          "description": "Leave a fading trail behind the dot."
+        },
+        "trailDuration": {
+          "name": "Trail Length (ms)",
+          "description": "How far back in time the trail reaches."
+        },
+        "trailColor": {
+          "name": "Trail Color"
+        },
+        "showCps": {
+          "name": "Show CPS",
+          "description": "Show your left and right clicks per second in two boxes below."
+        },
+        "cpsGap": {
+          "name": "CPS Gap",
+          "description": "Space between the pad and the click boxes."
+        },
+        "textColor": {
+          "name": "Text Color"
+        }
       }
     }
   }
