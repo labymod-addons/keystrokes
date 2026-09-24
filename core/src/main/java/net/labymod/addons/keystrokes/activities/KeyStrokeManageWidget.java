@@ -27,6 +27,7 @@ import net.labymod.addons.keystrokes.widgets.KeyStrokeGridWidget;
 import net.labymod.addons.keystrokes.widgets.KeyStrokeWidget;
 import net.labymod.api.Laby;
 import net.labymod.api.client.component.format.NamedTextColor;
+import net.labymod.api.client.gfx.pipeline.renderer.text.TextRenderingOptions;
 import net.labymod.api.client.gui.HorizontalAlignment;
 import net.labymod.api.client.gui.VerticalAlignment;
 import net.labymod.api.client.gui.lss.property.annotation.AutoWidget;
@@ -37,7 +38,6 @@ import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.KeyHandler;
 import net.labymod.api.client.gui.screen.key.MouseButton;
 import net.labymod.api.client.gui.screen.state.ScreenCanvas;
-import net.labymod.api.client.gui.screen.state.TextFlags;
 import net.labymod.api.client.gui.screen.state.states.GuiRectangleRenderState.RectConfig;
 import net.labymod.api.client.gui.screen.widget.AbstractWidget;
 import net.labymod.api.client.gui.screen.widget.Widget;
@@ -144,7 +144,7 @@ public class KeyStrokeManageWidget extends KeyStrokeGridWidget {
         this.bounds().getCenterX(), this.bounds().getMaxY() - 10,
         NamedTextColor.GRAY.getValue(),
         PredefinedFontSize.SMALL,
-        TextFlags.CENTERED | TextFlags.SHADOW
+        TextRenderingOptions.CENTERED | TextRenderingOptions.SHADOW
     );
   }
 
