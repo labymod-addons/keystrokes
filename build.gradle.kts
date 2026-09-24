@@ -27,7 +27,7 @@ labyMod {
         description = "Example Description"
         minecraftVersion = "*"
         version = rootProject.version.toString()
-        releaseChannel = ReleaseChannels.INTERNAL
+        releaseChannel = ReleaseChannels.PRODUCTION
     }
 }
 
