@@ -18,10 +18,12 @@ package net.labymod.addons.keystrokes.hudwidget;
 
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
+import net.labymod.addons.keystrokes.share.KeyStrokesChatShare;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.hud.hudwidget.widget.WidgetHudWidget;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.widget.widgets.hud.HudWidgetWidget;
+import net.labymod.api.configuration.settings.Setting;
 import net.labymod.api.event.Subscribe;
 import net.labymod.api.event.client.gui.screen.ScreenDisplayEvent;
 import net.labymod.api.event.client.input.KeyEvent;
@@ -29,12 +31,38 @@ import net.labymod.api.event.client.input.KeyEvent.State;
 import net.labymod.api.event.client.input.MouseButtonEvent;
 import net.labymod.api.event.client.input.MouseButtonEvent.Action;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class KeyStrokesHudWidget extends WidgetHudWidget<KeyStrokesHudWidgetConfig> {
 
+  private static final String SHARE_SETTING = "share";
+
+  private List<Setting> settingsSource;
+  private List<Setting> settingsWithoutShare;
+
   public KeyStrokesHudWidget() {
     super("keyStrokes", KeyStrokesHudWidgetConfig.class);
+  }
+
+  /**
+   * Without Laby Chat sharing in this client build, the Share button is left out.
+   */
+  @Override
+  public List<Setting> getSettings() {
+    List<Setting> settings = super.getSettings();
+    if (settings == null || KeyStrokesChatShare.isAvailable()) {
+      return settings;
+    }
+
+    if (settings != this.settingsSource) {
+      this.settingsSource = settings;
+      this.settingsWithoutShare = new ArrayList<>(settings);
+      this.settingsWithoutShare.removeIf(setting -> SHARE_SETTING.equals(setting.getId()));
+    }
+
+    return this.settingsWithoutShare;
   }
 
   @Override

@@ -17,6 +17,7 @@
 package net.labymod.addons.keystrokes;
 
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidget;
+import net.labymod.addons.keystrokes.share.KeyStrokesChatShare;
 import net.labymod.api.addon.LabyAddon;
 import net.labymod.api.models.addon.annotation.AddonMain;
 
@@ -27,7 +28,18 @@ public class KeyStrokes extends LabyAddon<KeyStrokesConfiguration> {
   protected void enable() {
     this.registerSettingCategory();
 
-    this.labyAPI().hudWidgetRegistry().register(new KeyStrokesHudWidget());
+    KeyStrokesHudWidget hudWidget = new KeyStrokesHudWidget();
+    this.labyAPI().hudWidgetRegistry().register(hudWidget);
+
+    // Share the layout with friends through the Laby Chat, on client builds that have it
+    try {
+      Class.forName(KeyStrokesChatShare.SHARE_API_CLASS);
+      KeyStrokesChatShare.register(hudWidget);
+    } catch (ClassNotFoundException | LinkageError ignored) {
+      this.logger().info(
+          "Laby Chat sharing not available in this client build, layouts cannot be shared"
+      );
+    }
   }
 
   @Override
