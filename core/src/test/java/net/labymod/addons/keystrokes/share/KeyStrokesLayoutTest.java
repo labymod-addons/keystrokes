@@ -36,6 +36,7 @@ import java.util.function.Predicate;
 import net.labymod.addons.keystrokes.share.KeyStrokesLayout.KeyEntry;
 import net.labymod.addons.keystrokes.share.KeyStrokesLayout.ShareColor;
 import net.labymod.api.labyconnect.share.ChatSharePreview;
+import net.labymod.api.labyconnect.share.ShareCodec;
 import org.junit.jupiter.api.Test;
 
 class KeyStrokesLayoutTest {
@@ -118,6 +119,35 @@ class KeyStrokesLayoutTest {
     KeyStrokesLayout layout = layout();
 
     assertEquals(layout, KeyStrokesLayout.read(layout.write(), ANY_KEY));
+  }
+
+  @Test
+  void codecStartsAtVersionOne() {
+    ShareCodec<KeyStrokesLayout> codec = new KeyStrokesCodec(ANY_KEY);
+
+    assertEquals(1, codec.version());
+  }
+
+  @Test
+  void codecWritesThePayloadOfTheLayout() {
+    ShareCodec<KeyStrokesLayout> codec = new KeyStrokesCodec(ANY_KEY);
+    KeyStrokesLayout layout = layout();
+
+    JsonObject data = codec.write(layout);
+    assertEquals(layout.write(), data);
+    assertEquals(Set.of(KeyStrokesLayout.VALUES), data.keySet());
+    assertEquals(layout, codec.read(data, codec.version()));
+  }
+
+  @Test
+  void codecChecksTheKeysOfThisClient() {
+    ShareCodec<KeyStrokesLayout> codec = new KeyStrokesCodec(name -> !name.equals("W"));
+
+    KeyStrokesLayout layout = codec.read(payload(), 1);
+    assertNotNull(layout);
+    assertEquals(6, layout.keys().size());
+    assertNull(new KeyStrokesCodec(name -> !name.equals("S")).read(payload(), 1));
+    assertNull(codec.read(new JsonObject(), 1));
   }
 
   @Test

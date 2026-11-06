@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 public final class KeyStrokesChatShare {
 
   /**
-   * The registry of the share API, present from Laby Client 49 on.
+   * The registry of the share API, present from Laby Client 50 on.
    */
   public static final String SHARE_API_CLASS =
       "net.labymod.api.labyconnect.share.ChatShareRegistry";

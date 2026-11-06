@@ -16,11 +16,11 @@
 
 package net.labymod.addons.keystrokes.share;
 
-import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.event.KeyStrokeUpdateEvent;
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidget;
@@ -28,13 +28,12 @@ import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidgetConfig;
 import net.labymod.addons.keystrokes.share.KeyStrokesLayout.KeyEntry;
 import net.labymod.addons.keystrokes.share.KeyStrokesLayout.ShareColor;
 import net.labymod.api.Laby;
-import net.labymod.api.client.component.Component;
-import net.labymod.api.client.gui.icon.Icon;
 import net.labymod.api.client.gui.icon.catalog.IconsCommon;
 import net.labymod.api.client.gui.screen.key.Key;
-import net.labymod.api.labyconnect.share.ChatSharePreview;
+import net.labymod.api.labyconnect.share.ApplyResult;
 import net.labymod.api.labyconnect.share.ChatShareRegistry;
-import net.labymod.api.labyconnect.share.ChatShareable;
+import net.labymod.api.labyconnect.share.ShareKind;
+import net.labymod.api.labyconnect.share.ShareUndo;
 import net.labymod.api.util.Color;
 import net.labymod.api.util.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -42,22 +41,35 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The keystrokes widget as something to share in the Laby Chat: its colors, looks and keys.
+ * Applying one replaces the widget config, Undo brings back the layout before.
  */
-public final class KeyStrokesShareable implements ChatShareable<KeyStrokesLayout> {
+public final class KeyStrokesShareable {
 
-  public static final String KIND = "keystrokes:layout";
+  public static final String ID = "keystrokes:layout";
 
   private static final String LABEL = "Keystrokes";
 
   private final ChatShareRegistry registry;
   private final KeyStrokesHudWidget widget;
+  private final ShareKind<KeyStrokesLayout> kind;
 
-  public KeyStrokesShareable(
+  private KeyStrokesShareable(
       @NotNull ChatShareRegistry registry,
       @NotNull KeyStrokesHudWidget widget
   ) {
     this.registry = registry;
     this.widget = widget;
+    this.kind = ShareKind.builder(
+            ID,
+            new KeyStrokesCodec(KeyStrokesShareable::isKnownKey),
+            this::apply
+        )
+        .label(LABEL)
+        .displayName(widget.displayName())
+        .icon(IconsCommon.KEYBOARD)
+        .source(this::export)
+        .preview(KeyStrokesLayout::preview)
+        .build();
   }
 
   /**
@@ -66,7 +78,8 @@ public final class KeyStrokesShareable implements ChatShareable<KeyStrokesLayout
   static @NotNull KeyStrokesShareable register(@NotNull KeyStrokesHudWidget widget) {
     ChatShareRegistry registry = Laby.references().chatShareRegistry();
     KeyStrokesShareable shareable = new KeyStrokesShareable(registry, widget);
-    registry.register(shareable);
+    // The registry checks the namespace against this class, which belongs to the addon
+    registry.register(shareable.kind);
     return shareable;
   }
 
@@ -76,57 +89,68 @@ public final class KeyStrokesShareable implements ChatShareable<KeyStrokesLayout
   public void share(@NotNull KeyStrokesHudWidgetConfig config) {
     KeyStrokesLayout layout = layout(config);
     if (layout != null) {
-      this.registry.share(this, layout);
+      this.registry.share(this.kind, layout);
     }
   }
 
-  @Override
-  public @NotNull String kind() {
-    return KIND;
+  public @NotNull ShareKind<KeyStrokesLayout> kind() {
+    return this.kind;
   }
 
-  @Override
-  public @NotNull String label() {
-    return LABEL;
-  }
-
-  @Override
-  public @NotNull Component displayName() {
-    return this.widget.displayName();
-  }
-
-  @Override
-  public @NotNull Icon icon() {
-    return IconsCommon.KEYBOARD;
-  }
-
-  @Override
-  public @Nullable KeyStrokesLayout export() {
+  /**
+   * The layout the share menu of a chat sends.
+   */
+  private @Nullable KeyStrokesLayout export() {
     KeyStrokesHudWidgetConfig config = this.widget.getConfig();
     return config == null ? null : layout(config);
   }
 
-  @Override
-  public @NotNull JsonObject write(@NotNull KeyStrokesLayout value) {
-    return value.write();
-  }
-
-  @Override
-  public @Nullable KeyStrokesLayout read(@NotNull JsonObject data) {
-    return KeyStrokesLayout.read(data, KeyStrokesShareable::isKnownKey);
-  }
-
-  @Override
-  public @NotNull ChatSharePreview preview(@NotNull KeyStrokesLayout value) {
-    return value.preview();
-  }
-
-  @Override
-  public void apply(@NotNull KeyStrokesLayout value) {
+  /**
+   * Replaces the widget config with the layout. Fails without changing anything if this client
+   * cannot build the keys of the layout.
+   */
+  private @NotNull CompletableFuture<ApplyResult> apply(@NotNull KeyStrokesLayout value) {
     ThreadSafe.ensureRenderThread();
     KeyStrokesHudWidgetConfig config = this.widget.getConfig();
     if (config == null) {
-      return;
+      return CompletableFuture.completedFuture(ApplyResult.failed(null));
+    }
+
+    KeyStrokesLayout before = layout(config);
+    if (!this.write(config, value)) {
+      return CompletableFuture.completedFuture(ApplyResult.failed(null));
+    }
+
+    // A config that lost its base key has no layout to go back to
+    ShareUndo undo = before == null ? null : ShareUndo.of(() -> {
+      KeyStrokesHudWidgetConfig current = this.widget.getConfig();
+      if (current != null) {
+        this.write(current, before);
+      }
+    });
+    return CompletableFuture.completedFuture(ApplyResult.applied(undo));
+  }
+
+  /**
+   * Writes a layout into the config, reloads the widget and saves the HUD config.
+   *
+   * @return {@code false} if nothing was written since the keys cannot be built
+   */
+  private boolean write(
+      @NotNull KeyStrokesHudWidgetConfig config,
+      @NotNull KeyStrokesLayout value
+  ) {
+    Key base = Key.getByName(value.base());
+    Set<KeyStrokeConfig> keyStrokes = new HashSet<>();
+    for (KeyEntry entry : value.keys()) {
+      Key key = Key.getByName(entry.key());
+      if (key != null) {
+        keyStrokes.add(new KeyStrokeConfig(key, entry.x(), entry.y()));
+      }
+    }
+
+    if (base == null || keyStrokes.isEmpty()) {
+      return false;
     }
 
     // The switches move the current keys, so they go before the keys are replaced
@@ -143,19 +167,6 @@ public final class KeyStrokesShareable implements ChatShareable<KeyStrokesLayout
     config.bigSpace().set(value.bigSpace());
     config.trackMouseCPS().set(value.trackMouseCPS());
 
-    Key base = Key.getByName(value.base());
-    Set<KeyStrokeConfig> keyStrokes = new HashSet<>();
-    for (KeyEntry entry : value.keys()) {
-      Key key = Key.getByName(entry.key());
-      if (key != null) {
-        keyStrokes.add(new KeyStrokeConfig(key, entry.x(), entry.y()));
-      }
-    }
-
-    if (base == null || keyStrokes.isEmpty()) {
-      return;
-    }
-
     config.replaceKeyStrokes(keyStrokes, base);
     config.refreshCPSTracking();
     config.updateSpace(false);
@@ -167,6 +178,7 @@ public final class KeyStrokesShareable implements ChatShareable<KeyStrokesLayout
     }
 
     Laby.references().hudWidgetRegistry().saveConfig();
+    return true;
   }
 
   /**
