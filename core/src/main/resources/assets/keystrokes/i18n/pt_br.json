@@ -15,6 +15,24 @@
             "keyStrokes": {
                 "textColor": {
                     "name": "Cor do Texto"
+                },
+                "edit": {
+                    "name": "Editar Layout"
+                },
+                "backgroundColor": {
+                    "name": "Cor de Fundo"
+                },
+                "outline": {
+                    "name": "Contorno"
+                },
+                "outlineColor": {
+                    "name": "Cor do Contorno"
+                },
+                "pressedColor": {
+                    "name": "Cor Quando Pressionado"
+                },
+                "transition": {
+                    "name": "Transição"
                 }
             }
         },
