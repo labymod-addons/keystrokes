@@ -22,11 +22,11 @@ import net.labymod.addons.keystrokes.util.KeyTracker;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gfx.pipeline.RenderAttributes;
 import net.labymod.api.client.gfx.pipeline.RenderAttributesStack;
+import net.labymod.api.client.gfx.pipeline.renderer.text.TextRenderingOptions;
 import net.labymod.api.client.gui.screen.ScreenContext;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.state.RoundedData;
 import net.labymod.api.client.gui.screen.state.ScreenCanvas;
-import net.labymod.api.client.gui.screen.state.TextFlags;
 import net.labymod.api.client.gui.screen.state.states.GuiRectangleRenderState.RectConfig;
 import net.labymod.api.client.gui.screen.widget.SimpleWidget;
 import net.labymod.api.client.gui.screen.widget.attributes.bounds.Bounds;
@@ -163,7 +163,9 @@ public class KeyStrokeWidget extends SimpleWidget {
         x, y,
         textColor,
         1.0F,
-        TextFlags.SHADOW | TextFlags.CENTERED | TextFlags.USE_FLOATING_POINT_VALUES
+        TextRenderingOptions.SHADOW
+            | TextRenderingOptions.CENTERED
+            | TextRenderingOptions.USE_FLOATING_POINT_VALUES
     );
 
     if (keyTracker != null) {
@@ -175,7 +177,9 @@ public class KeyStrokeWidget extends SimpleWidget {
           0, fontHeight * 1.5F + 3,
           textColor,
           1.0F,
-          TextFlags.SHADOW | TextFlags.CENTERED | TextFlags.USE_FLOATING_POINT_VALUES
+          TextRenderingOptions.SHADOW
+              | TextRenderingOptions.CENTERED
+              | TextRenderingOptions.USE_FLOATING_POINT_VALUES
       );
       stack.pop();
     }

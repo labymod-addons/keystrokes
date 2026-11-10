@@ -17,6 +17,7 @@
 package net.labymod.addons.keystrokes;
 
 import net.labymod.addons.keystrokes.hudwidget.KeyStrokesHudWidget;
+import net.labymod.addons.keystrokes.hudwidget.MouseTrackerHudWidget;
 import net.labymod.api.addon.LabyAddon;
 import net.labymod.api.models.addon.annotation.AddonMain;
 
@@ -28,6 +29,7 @@ public class KeyStrokes extends LabyAddon<KeyStrokesConfiguration> {
     this.registerSettingCategory();
 
     this.labyAPI().hudWidgetRegistry().register(new KeyStrokesHudWidget());
+    this.labyAPI().hudWidgetRegistry().register(new MouseTrackerHudWidget());
   }
 
   @Override
