@@ -28,6 +28,11 @@
         "edit": {
           "name": "Edit Layout"
         },
+        "share": {
+          "name": "Share Layout",
+          "description": "Sends your keys and colors to a friend in the Laby Chat.",
+          "text": "Share"
+        },
         "pressedColor": {
           "name": "Color When Pressed"
         },

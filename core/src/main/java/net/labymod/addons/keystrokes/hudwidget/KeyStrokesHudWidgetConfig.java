@@ -18,12 +18,14 @@ package net.labymod.addons.keystrokes.hudwidget;
 
 import net.labymod.addons.keystrokes.KeyStrokeConfig;
 import net.labymod.addons.keystrokes.activities.KeyStrokeManageActivity;
+import net.labymod.addons.keystrokes.share.KeyStrokesChatShare;
 import net.labymod.api.Laby;
 import net.labymod.api.client.gui.hud.hudwidget.HudWidgetConfig;
 import net.labymod.api.client.gui.screen.activity.Activity;
 import net.labymod.api.client.gui.screen.key.Key;
 import net.labymod.api.client.gui.screen.key.MouseButton;
 import net.labymod.api.client.gui.screen.widget.widgets.activity.settings.ActivitySettingWidget.ActivitySetting;
+import net.labymod.api.client.gui.screen.widget.widgets.input.ButtonWidget.ButtonSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.SliderWidget.SliderSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.SwitchWidget.SwitchSetting;
 import net.labymod.api.client.gui.screen.widget.widgets.input.color.ColorPickerWidget.ColorPickerSetting;
@@ -102,6 +104,15 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
   @ActivitySetting
   public Activity edit() {
     return new KeyStrokeManageActivity(this);
+  }
+
+  /**
+   * Only listed on clients with Laby Chat sharing, see {@link KeyStrokesHudWidget#getSettings()}.
+   */
+  @MethodOrder(after = "edit")
+  @ButtonSetting
+  public void share() {
+    KeyStrokesChatShare.share(this);
   }
 
   public ConfigProperty<Color> pressedColor() {
@@ -202,6 +213,16 @@ public class KeyStrokesHudWidgetConfig extends HudWidgetConfig {
 
     this.keyStrokes.get().add(keyStrokeConfig);
     return true;
+  }
+
+  /**
+   * Replaces every key, for example with a layout received in the Laby Chat.
+   *
+   * @param base the key the others are placed relative to, one of the keys
+   */
+  public void replaceKeyStrokes(Set<KeyStrokeConfig> keyStrokes, Key base) {
+    this.keyStrokes.set(keyStrokes);
+    this.base.set(base);
   }
 
   public boolean removeKeyStroke(KeyStrokeConfig keyStrokeConfig) {
