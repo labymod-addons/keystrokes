@@ -18,7 +18,6 @@ package net.labymod.addons.keystrokes.util;
 
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import it.unimi.dsi.fastutil.longs.LongListIterator;
 
 public class KeyTracker {
 
@@ -29,13 +28,18 @@ public class KeyTracker {
   }
 
   public void update() {
+    // Compacts in place instead of using an iterator, as this runs every frame
     long currentTime = System.currentTimeMillis();
-    LongListIterator iterator = this.clicks.iterator();
-    while (iterator.hasNext()) {
-      if (iterator.nextLong() < currentTime) {
-        iterator.remove();
+    LongList clicks = this.clicks;
+    int kept = 0;
+    for (int index = 0, size = clicks.size(); index < size; index++) {
+      long expiry = clicks.getLong(index);
+      if (expiry >= currentTime) {
+        clicks.set(kept++, expiry);
       }
     }
+
+    clicks.size(kept);
   }
 
   public int getCount() {
